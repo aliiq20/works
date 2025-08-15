@@ -8,17 +8,10 @@
 <style>
 :root {
   --bg:#000;
-  --accent:#ffa500; /* افتراضي برتقالي */
-  --accent-hover:#ff8c00;
+  --accent:#ffa500; /* برتقالي أول ما يفتح */
+  --accent-hover:#ffb000;
   --text:#fff;
 }
-
-/* أنيميشن تدرج متموج */
-@keyframes rgbWave {
-  0% { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
-}
-
 * {
   box-sizing:border-box;
   margin:0;
@@ -29,7 +22,7 @@ html, body {
   font-family:system-ui,Segoe UI,Roboto,"Noto Naskh Arabic UI",Tahoma,Arial,sans-serif;
   background:var(--bg);
   color:var(--text);
-  overflow-x:hidden;
+  overflow:hidden;
 }
 #snow, .stars {
   position:fixed;
@@ -56,8 +49,6 @@ html, body {
   min-height:100%;
   padding:23px 11px;
   gap:11px;
-  transform-origin: top center;
-  transition: transform 0.3s ease;
 }
 .avatar {
   width:40%;
@@ -109,6 +100,7 @@ h1 {
 .spacer {
   height:23px;
 }
+
 /* زر الإعدادات */
 #settingsBtn {
 position:absolute;
@@ -126,6 +118,7 @@ transition:background 0.2s;
 #settingsBtn.active {
 background:#666;
 }
+
 /* قائمة الإعدادات */
 #settingsMenu {
 position:absolute;
@@ -155,29 +148,6 @@ font-size:14px;
 #settingsMenu input {
 width:100%;
 }
-.color-option {
-display:inline-block;
-width:22px;
-height:22px;
-border-radius:50%;
-margin:2px;
-cursor:pointer;
-border:1px solid #fff;
-}
-.range-container {
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-#scaleValue {
-  min-width: 40px;
-  text-align:center;
-  font-size:13px;
-  color:#fff;
-  background:#333;
-  border-radius:4px;
-  padding:2px 4px;
-}
 </style>
 </head>
 <body>
@@ -189,32 +159,31 @@ border:1px solid #fff;
 
 <!-- قائمة الإعدادات -->
 <div id="settingsMenu">
-  <label>اختر اللون:</label>
-  <div>
-    <span class="color-option" data-color="#ffa500" style="background:#ffa500;" title="برتقالي"></span>
-    <span class="color-option" data-color="#800080" style="background:#800080;" title="بنفسجي"></span>
-    <span class="color-option" data-color="#8B4513" style="background:#8B4513;" title="جوزي"></span>
-    <span class="color-option" data-color="#C2B280" style="background:#C2B280;" title="صحراوي"></span>
-    <span class="color-option" data-color="#808080" style="background:#808080;" title="رمادي"></span>
-    <span class="color-option" data-color="rgb" style="background:linear-gradient(90deg, red, orange, yellow, green, blue, purple);" title="RGB"></span>
-    <input type="color" id="colorPicker" value="#ffa500">
-  </div>
-  <label>حجم الصفحة:</label>
-  <div class="range-container">
-    <input type="range" id="scaleInput" min="50" max="600" value="100">
-    <div id="scaleValue">100%</div>
-  </div>
+  <label>اختر اللون:
+    <select id="colorPicker">
+      <option value="#ffa500">برتقالي</option>
+      <option value="#800080">بنفسجي</option>
+      <option value="#8b4513">جوزي</option>
+      <option value="#c2b280">صحراوي</option>
+      <option value="#808080">رمادي</option>
+      <option value="rgb">RGB</option>
+    </select>
+  </label>
+  <label>حجم الصورة (%):
+    <input type="range" id="scaleInput" min="50" max="150" value="100">
+    <span id="scaleValue">100%</span>
+  </label>
 </div>
 
 <main class="wrap">
   <img class="avatar" src="myphoto.JPG" alt="صورة شخصية" />
   <h1>المصور علي الشمري 📸</h1>
-  <a class="btn" href="https://t.me/AliPhoto25" target="_blank" rel="noopener">All my works 🎯 📂</a>
-  <a class="btn" href="https://www.instagram.com/1cc_c?igsh=MWR6dnU1YWxudmp4Zg==" target="_blank" rel="noopener">Photography account 📸</a>
-  <a class="btn" href="https://www.tiktok.com/@sh.di" target="_blank" rel="noopener">Tik Tok 🎵</a>
-  <a class="btn" href="https://www.youtube.com/@shmri25" target="_blank" rel="noopener">YouTube ▶️</a>
-  <a class="btn" href="https://www.facebook.com/share/1FHHbLJT6i/" target="_blank" rel="noopener">Facebook account 📘</a>
-  <a class="btn" href="https://www.facebook.com/share/16p6V6pzLw/" target="_blank" rel="noopener">Facebook page 🌐</a>
+  <a class="btn" href="https://t.me/AliPhoto25" target="_blank">All my works 🎯 📂</a>
+  <a class="btn" href="https://www.instagram.com/1cc_c" target="_blank">Photography account 📸</a>
+  <a class="btn" href="https://www.tiktok.com/@sh.di" target="_blank">Tik Tok 🎵</a>
+  <a class="btn" href="https://www.youtube.com/@shmri25" target="_blank">YouTube ▶️</a>
+  <a class="btn" href="https://www.facebook.com/share/1FHHbLJT6i/" target="_blank">Facebook account 📘</a>
+  <a class="btn" href="https://www.facebook.com/share/16p6V6pzLw/" target="_blank">Facebook page 🌐</a>
 
   <button class="btn" onclick="togglePlay()">علي اميري</button>
   <audio id="player" src="علي أميري ونعم الأمير _ أجمل أنشودة(MP3_160K).mp3"></audio>
@@ -229,7 +198,7 @@ function togglePlay() {
   if(player.paused) { player.play(); } else { player.pause(); }
 }
 
-// ثلج متحرك
+// ثلج
 (function() {
   const c = document.getElementById('snow');
   const ctx = c.getContext('2d');
@@ -270,7 +239,6 @@ function togglePlay() {
 })();
 
 // إعدادات
-const wrap = document.querySelector(".wrap");
 const avatar = document.querySelector(".avatar");
 const buttons = document.querySelectorAll(".btn");
 const settingsBtn = document.getElementById("settingsBtn");
@@ -278,7 +246,8 @@ const settingsMenu = document.getElementById("settingsMenu");
 const colorPicker = document.getElementById("colorPicker");
 const scaleInput = document.getElementById("scaleInput");
 const scaleValue = document.getElementById("scaleValue");
-const colorOptions = document.querySelectorAll(".color-option");
+
+let rgbInterval;
 
 // فتح/إغلاق القائمة
 settingsBtn.addEventListener("click", () => {
@@ -298,48 +267,48 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// تغيير الحجم بالسلايدر
-scaleInput.addEventListener("input", () => {
-  let scaleVal = scaleInput.value;
-  scaleValue.textContent = scaleVal + "%";
-  wrap.style.transform = `scale(${scaleVal/100})`;
-  document.body.style.overflowY = (scaleVal > 100) ? "auto" : "hidden";
+// تغيير اللون
+colorPicker.addEventListener("change", () => {
+  clearInterval(rgbInterval);
+  const val = colorPicker.value;
+  if(val === "rgb"){
+    startRGB();
+  } else {
+    document.documentElement.style.setProperty("--accent", val);
+    avatar.style.borderColor = val;
+    avatar.style.boxShadow = `0 0 25px ${val}, 0 0 4px rgba(255,255,255,.9) inset`;
+    buttons.forEach(btn => {
+      btn.style.background = val;
+      btn.style.boxShadow = `0 0 12px ${val}, 0 0 3px rgba(255,255,255,.7) inset`;
+    });
+  }
 });
 
-// اختيار اللون
-function setColor(color) {
-  if (color === "rgb") {
-    avatar.style.animation = "rgbWave 5s infinite linear";
-    buttons.forEach(btn => btn.style.animation = "rgbWave 5s infinite linear");
-  } else {
-    avatar.style.animation = "none";
-    buttons.forEach(btn => btn.style.animation = "none");
-    document.documentElement.style.setProperty("--accent", color);
-    document.documentElement.style.setProperty("--accent-hover", color);
+// حجم الصورة
+scaleInput.addEventListener("input", () => {
+  const scale = scaleInput.value;
+  scaleValue.textContent = scale + "%";
+  avatar.style.width = `${scale}%`;
+});
+
+// دالة RGB متموج
+function startRGB(){
+  let step = 0;
+  rgbInterval = setInterval(() => {
+    const r = Math.floor(Math.sin(0.3*step + 0) * 127 + 128);
+    const g = Math.floor(Math.sin(0.3*step + 2) * 127 + 128);
+    const b = Math.floor(Math.sin(0.3*step + 4) * 127 + 128);
+    const color = `rgb(${r},${g},${b})`;
     avatar.style.borderColor = color;
     avatar.style.boxShadow = `0 0 25px ${color}, 0 0 4px rgba(255,255,255,.9) inset`;
     buttons.forEach(btn => {
       btn.style.background = color;
       btn.style.boxShadow = `0 0 12px ${color}, 0 0 3px rgba(255,255,255,.7) inset`;
     });
-  }
+    step++;
+  }, 50);
 }
 
-// الألوان الجاهزة
-colorOptions.forEach(opt => {
-  opt.addEventListener("click", () => {
-    setColor(opt.dataset.color);
-    closeSettings();
-  });
-});
-
-// اللون من الكول بيكر
-colorPicker.addEventListener("input", () => {
-  setColor(colorPicker.value);
-  closeSettings();
-});
-
-// دالة غلق القائمة
 function closeSettings(){
   settingsMenu.classList.remove("show");
   settingsBtn.classList.remove("active");
