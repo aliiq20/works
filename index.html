@@ -100,6 +100,7 @@ h1 {
 .spacer {
   height:23px;
 }
+
 /* زر الإعدادات */
 #settingsBtn {
   position:absolute;
@@ -112,8 +113,13 @@ h1 {
   border-radius:8px;
   cursor:pointer;
   z-index:10;
+  transition:background 0.2s;
 }
-/* قائمة الإعدادات */
+#settingsBtn.active {
+  background:#666;
+}
+
+/* قائمة الإعدادات مع الانيميشن */
 #settingsMenu {
   position:absolute;
   top:50px;
@@ -124,6 +130,14 @@ h1 {
   display:none;
   z-index:10;
   width:150px;
+  opacity:0;
+  transform:translateY(-10px);
+  transition:opacity 0.25s ease, transform 0.25s ease;
+}
+#settingsMenu.show {
+  display:block;
+  opacity:1;
+  transform:translateY(0);
 }
 #settingsMenu label {
   display:block;
@@ -179,7 +193,7 @@ function togglePlay() {
   if(player.paused) { player.play(); } else { player.pause(); }
 }
 
-// إعدادات الثلج
+// ثلج متحرك
 (function() {
   const c = document.getElementById('snow');
   const ctx = c.getContext('2d');
@@ -219,7 +233,7 @@ function togglePlay() {
   step();
 })();
 
-// أكواد الإعدادات
+// إعدادات
 const avatar = document.querySelector(".avatar");
 const buttons = document.querySelectorAll(".btn");
 const settingsBtn = document.getElementById("settingsBtn");
@@ -229,7 +243,20 @@ const scaleInput = document.getElementById("scaleInput");
 
 // فتح/إغلاق القائمة
 settingsBtn.addEventListener("click", () => {
-  settingsMenu.style.display = settingsMenu.style.display === "block" ? "none" : "block";
+  if(settingsMenu.classList.contains("show")){
+    closeSettings();
+  } else {
+    settingsMenu.style.display = "block";
+    setTimeout(() => settingsMenu.classList.add("show"), 10);
+    settingsBtn.classList.add("active");
+  }
+});
+
+// إغلاق القائمة بالضغط خارجها
+document.addEventListener("click", (e) => {
+  if(!settingsMenu.contains(e.target) && e.target !== settingsBtn){
+    closeSettings();
+  }
 });
 
 // تغيير اللون
@@ -242,8 +269,22 @@ colorPicker.addEventListener("input", () => {
     btn.style.background = color;
     btn.style.boxShadow = `0 0 12px ${color}, 0 0 3px rgba(255,255,255,.7) inset`;
   });
-  settingsMenu.style.display = "none";
+  closeSettings();
 });
 
-// تغيير حجم الصورة
+// تغيير الحجم
 scaleInput.addEventListener("input", () => {
+  const scale = scaleInput.value;
+  avatar.style.width = `${scale}%`;
+  closeSettings();
+});
+
+// دالة غلق القائمة
+function closeSettings(){
+  settingsMenu.classList.remove("show");
+  settingsBtn.classList.remove("active");
+  setTimeout(() => settingsMenu.style.display = "none", 250);
+}
+</script>
+</body>
+</html>
