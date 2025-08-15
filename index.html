@@ -11,9 +11,12 @@
   --accent:#ffd400;
   --accent-hover:#ffb000;
   --text:#fff;
-  --scale:1;
 }
-* {box-sizing:border-box;margin:0;padding:0;}
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 html, body {
   height:100%;
   font-family:system-ui,Segoe UI,Roboto,"Noto Naskh Arabic UI",Tahoma,Arial,sans-serif;
@@ -46,16 +49,16 @@ html, body {
   min-height:100%;
   padding:23px 11px;
   gap:11px;
-  transform: scale(var(--scale));
-  transition: transform 0.2s ease;
 }
 .avatar {
-  width:min(40vw,172px);
+  width:40%;
+  max-width:172px;
   aspect-ratio:1/1;
   border-radius:50%;
   object-fit:cover;
-  border:2px solid #fff;
+  border:2px solid var(--accent);
   box-shadow:0 0 25px var(--accent),0 0 4px rgba(255,255,255,.9) inset;
+  transition:all .3s ease;
 }
 h1 {
   margin:4px 0 0;
@@ -86,63 +89,73 @@ h1 {
   box-shadow:0 0 18px var(--accent-hover);
   transform:translateY(-1px);
 }
-.btn:active {transform:translateY(0);}
-.credit {opacity:.8;font-size:12px;margin-top:6px;}
-.spacer {height:23px;}
-
-/* لوحة التحكم أعلى يمين */
-.control-panel {
-  position: absolute;
-  top:20px;
-  right:20px;
-  background: rgba(0,0,0,0.7);
-  padding:12px;
-  border-radius:12px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.btn:active {
+  transform:translateY(0);
+}
+.credit {
+  opacity:.8;
+  font-size:12px;
+  margin-top:6px;
+}
+.spacer {
+  height:23px;
+}
+/* زر الإعدادات */
+#settingsBtn {
+  position:absolute;
+  top:15px;
+  left:15px;
+  background:#444;
+  color:#fff;
+  border:none;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
   z-index:10;
+}
+/* قائمة الإعدادات */
+#settingsMenu {
+  position:absolute;
+  top:50px;
+  left:15px;
+  background:#222;
+  padding:10px;
+  border-radius:8px;
+  display:none;
+  z-index:10;
+  width:150px;
+}
+#settingsMenu label {
+  display:block;
+  margin-bottom:8px;
   color:#fff;
   font-size:14px;
 }
-.control-panel label {display:block;margin-bottom:4px;}
-.control-panel input[type=range] {width:150px;}
-.control-panel select {width:160px;padding:2px;border-radius:6px;border:none;}
-.control-panel .rgb-sliders {display:none;flex-direction:column;gap:5px;margin-top:5px;}
-.control-panel .rgb-sliders input {width:140px;}
+#settingsMenu input {
+  width:100%;
+}
 </style>
 </head>
 <body>
-
 <div class="stars" aria-hidden="true"></div>
 <canvas id="snow" aria-hidden="true"></canvas>
 
+<!-- زر الإعدادات -->
+<button id="settingsBtn">⚙️</button>
+
+<!-- قائمة الإعدادات -->
+<div id="settingsMenu">
+  <label>
+    اختر اللون:
+    <input type="color" id="colorPicker" value="#ffd400">
+  </label>
+  <label>
+    حجم الصورة (%):
+    <input type="number" id="scaleInput" min="50" max="150" value="100">
+  </label>
+</div>
+
 <main class="wrap">
-  <!-- لوحة التحكم -->
-  <div class="control-panel">
-    <label for="scaleRange">حجم العرض (Scale): <span id="scaleValue">100%</span></label>
-    <input type="range" id="scaleRange" min="50" max="150" value="100">
-
-    <label for="colorSelect">لون العرض + ظل الأزرار:</label>
-    <select id="colorSelect">
-      <option value="ffd400">أصفر كلاسيكي</option>
-      <option value="00ffff">سماوي</option>
-      <option value="ff00ff">وردي</option>
-      <option value="ff0000">أحمر</option>
-      <option value="00ff00">أخضر</option>
-      <option value="rgb">RGB متغير</option>
-    </select>
-
-    <div class="rgb-sliders">
-      <label>R: <span id="rVal">255</span></label>
-      <input type="range" id="rRange" min="0" max="255" value="255">
-      <label>G: <span id="gVal">212</span></label>
-      <input type="range" id="gRange" min="0" max="255" value="212">
-      <label>B: <span id="bVal">20</span></label>
-      <input type="range" id="bRange" min="0" max="255" value="20">
-    </div>
-  </div>
-
   <img class="avatar" src="myphoto.JPG" alt="صورة شخصية" />
   <h1>المصور علي الشمري 📸</h1>
 
@@ -162,66 +175,75 @@ h1 {
 
 <script>
 const player = document.getElementById('player');
-function togglePlay() {player.paused?player.play():player.pause();}
+function togglePlay() {
+  if(player.paused) { player.play(); } else { player.pause(); }
+}
 
-// تغيير الحجم
-const scaleRange = document.getElementById('scaleRange');
-const scaleValue = document.getElementById('scaleValue');
-scaleRange.addEventListener('input', ()=>{
-  const scale = scaleRange.value/100;
-  document.documentElement.style.setProperty('--scale', scale);
-  scaleValue.textContent = scaleRange.value + '%';
+// إعدادات الثلج
+(function() {
+  const c = document.getElementById('snow');
+  const ctx = c.getContext('2d');
+  let W, H, flakes = [];
+  function resize() {
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+    const count = Math.floor((W*H)/15000);
+    flakes = Array.from({length:count},()=>spawn());
+  }
+  function spawn() {
+    return {
+      x: Math.random()*W,
+      y: Math.random()*H,
+      r: Math.random()*1.6 + 0.5,
+      s: Math.random()*0.5 + 0.2,
+      drift: Math.random()*0.5 + 0.15,
+      a: Math.random()*Math.PI*2
+    };
+  }
+  function step() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    for(let f of flakes){
+      f.y += f.s;
+      f.x += Math.cos(f.a += 0.01)*f.drift*0.6;
+      if(f.y > H+5) { f.y = -5; f.x = Math.random()*W; }
+      if(f.x < -5) { f.x = W+5; } else if(f.x > W+5) { f.x = -5; }
+      ctx.beginPath();
+      ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
+      ctx.fill();
+    }
+    requestAnimationFrame(step);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  step();
+})();
+
+// أكواد الإعدادات
+const avatar = document.querySelector(".avatar");
+const buttons = document.querySelectorAll(".btn");
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsMenu = document.getElementById("settingsMenu");
+const colorPicker = document.getElementById("colorPicker");
+const scaleInput = document.getElementById("scaleInput");
+
+// فتح/إغلاق القائمة
+settingsBtn.addEventListener("click", () => {
+  settingsMenu.style.display = settingsMenu.style.display === "block" ? "none" : "block";
 });
 
 // تغيير اللون
-const colorSelect = document.getElementById('colorSelect');
-const rgbSliders = document.querySelector('.rgb-sliders');
-const rRange = document.getElementById('rRange');
-const gRange = document.getElementById('gRange');
-const bRange = document.getElementById('bRange');
-const rVal = document.getElementById('rVal');
-const gVal = document.getElementById('gVal');
-const bVal = document.getElementById('bVal');
-
-function updateAccent(color) {
-  document.querySelectorAll('.btn').forEach(btn=>{
+colorPicker.addEventListener("input", () => {
+  const color = colorPicker.value;
+  document.documentElement.style.setProperty("--accent", color);
+  avatar.style.borderColor = color;
+  avatar.style.boxShadow = `0 0 25px ${color}, 0 0 4px rgba(255,255,255,.9) inset`;
+  buttons.forEach(btn => {
     btn.style.background = color;
     btn.style.boxShadow = `0 0 12px ${color}, 0 0 3px rgba(255,255,255,.7) inset`;
   });
-}
-
-colorSelect.addEventListener('change', ()=>{
-  if(colorSelect.value==='rgb') {
-    rgbSliders.style.display='flex';
-    updateAccent(`rgb(${rRange.value},${gRange.value},${bRange.value})`);
-  } else {
-    rgbSliders.style.display='none';
-    updateAccent('#'+colorSelect.value);
-  }
+  settingsMenu.style.display = "none";
 });
 
-[rRange,gRange,bRange].forEach(slider=>{
-  slider.addEventListener('input', ()=>{
-    rVal.textContent = rRange.value;
-    gVal.textContent = gRange.value;
-    bVal.textContent = bRange.value;
-    updateAccent(`rgb(${rRange.value},${gRange.value},${bRange.value})`);
-  });
-});
-
-// تساقط الثلج
-(function(){
-const c = document.getElementById('snow');
-const ctx = c.getContext('2d');
-let W,H,flakes=[];
-function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;flakes=Array.from({length:Math.floor((W*H)/15000)},()=>spawn());}
-function spawn(){return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.5,s:Math.random()*.5+.2,drift:Math.random()*.5+.15,a:Math.random()*Math.PI*2};}
-function step(){ctx.clearRect(0,0,W,H);ctx.fillStyle='rgba(255,255,255,0.9)';for(let f of flakes){f.y+=f.s;f.x+=Math.cos(f.a+=.01)*f.drift*.6;if(f.y>H+5){f.y=-5;f.x=Math.random()*W;}if(f.x<-5){f.x=W+5;}else if(f.x>W+5){f.x=-5;}ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();}requestAnimationFrame(step);}
-window.addEventListener('resize',resize);
-resize();
-step();
-})();
-</script>
-
-</body>
-</html>
+// تغيير حجم الصورة
+scaleInput.addEventListener("input", () => {
