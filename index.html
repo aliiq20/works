@@ -8,18 +8,15 @@
 <style>
 :root {
   --bg:#000;
-  --accent:#ffd400;
-  --accent-hover:#ffb000;
+  --accent:#ffa500; /* افتراضي برتقالي */
+  --accent-hover:#ff8c00;
   --text:#fff;
 }
 
-/* أنيميشن متدرج ألوان RGB */
-@keyframes rgbGradient {
-  0% { --accent: rgb(255,0,0); }
-  25% { --accent: rgb(0,255,0); }
-  50% { --accent: rgb(0,0,255); }
-  75% { --accent: rgb(255,0,255); }
-  100% { --accent: rgb(255,0,0); }
+/* أنيميشن تدرج متموج */
+@keyframes rgbWave {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
 }
 
 * {
@@ -33,7 +30,6 @@ html, body {
   background:var(--bg);
   color:var(--text);
   overflow-x:hidden;
-  animation: rgbGradient 8s infinite linear;
 }
 #snow, .stars {
   position:fixed;
@@ -161,12 +157,26 @@ width:100%;
 }
 .color-option {
 display:inline-block;
-width:20px;
-height:20px;
+width:22px;
+height:22px;
 border-radius:50%;
 margin:2px;
 cursor:pointer;
 border:1px solid #fff;
+}
+.range-container {
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+#scaleValue {
+  min-width: 40px;
+  text-align:center;
+  font-size:13px;
+  color:#fff;
+  background:#333;
+  border-radius:4px;
+  padding:2px 4px;
 }
 </style>
 </head>
@@ -181,17 +191,19 @@ border:1px solid #fff;
 <div id="settingsMenu">
   <label>اختر اللون:</label>
   <div>
-    <span class="color-option" data-color="#ffa500" style="background:#ffa500;"></span>
-    <span class="color-option" data-color="#800080" style="background:#800080;"></span>
-    <span class="color-option" data-color="#8B4513" style="background:#8B4513;"></span>
-    <span class="color-option" data-color="#C2B280" style="background:#C2B280;"></span>
-    <span class="color-option" data-color="#808080" style="background:#808080;"></span>
-    <input type="color" id="colorPicker" value="#ffd400">
+    <span class="color-option" data-color="#ffa500" style="background:#ffa500;" title="برتقالي"></span>
+    <span class="color-option" data-color="#800080" style="background:#800080;" title="بنفسجي"></span>
+    <span class="color-option" data-color="#8B4513" style="background:#8B4513;" title="جوزي"></span>
+    <span class="color-option" data-color="#C2B280" style="background:#C2B280;" title="صحراوي"></span>
+    <span class="color-option" data-color="#808080" style="background:#808080;" title="رمادي"></span>
+    <span class="color-option" data-color="rgb" style="background:linear-gradient(90deg, red, orange, yellow, green, blue, purple);" title="RGB"></span>
+    <input type="color" id="colorPicker" value="#ffa500">
   </div>
-  <label>
-    حجم الصفحة (%):
-    <input type="number" id="scaleInput" min="50" max="600" value="100">
-  </label>
+  <label>حجم الصفحة:</label>
+  <div class="range-container">
+    <input type="range" id="scaleInput" min="50" max="600" value="100">
+    <div id="scaleValue">100%</div>
+  </div>
 </div>
 
 <main class="wrap">
@@ -265,6 +277,7 @@ const settingsBtn = document.getElementById("settingsBtn");
 const settingsMenu = document.getElementById("settingsMenu");
 const colorPicker = document.getElementById("colorPicker");
 const scaleInput = document.getElementById("scaleInput");
+const scaleValue = document.getElementById("scaleValue");
 const colorOptions = document.querySelectorAll(".color-option");
 
 // فتح/إغلاق القائمة
@@ -285,7 +298,34 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// اختيار الألوان الجاهزة
+// تغيير الحجم بالسلايدر
+scaleInput.addEventListener("input", () => {
+  let scaleVal = scaleInput.value;
+  scaleValue.textContent = scaleVal + "%";
+  wrap.style.transform = `scale(${scaleVal/100})`;
+  document.body.style.overflowY = (scaleVal > 100) ? "auto" : "hidden";
+});
+
+// اختيار اللون
+function setColor(color) {
+  if (color === "rgb") {
+    avatar.style.animation = "rgbWave 5s infinite linear";
+    buttons.forEach(btn => btn.style.animation = "rgbWave 5s infinite linear");
+  } else {
+    avatar.style.animation = "none";
+    buttons.forEach(btn => btn.style.animation = "none");
+    document.documentElement.style.setProperty("--accent", color);
+    document.documentElement.style.setProperty("--accent-hover", color);
+    avatar.style.borderColor = color;
+    avatar.style.boxShadow = `0 0 25px ${color}, 0 0 4px rgba(255,255,255,.9) inset`;
+    buttons.forEach(btn => {
+      btn.style.background = color;
+      btn.style.boxShadow = `0 0 12px ${color}, 0 0 3px rgba(255,255,255,.7) inset`;
+    });
+  }
+}
+
+// الألوان الجاهزة
 colorOptions.forEach(opt => {
   opt.addEventListener("click", () => {
     setColor(opt.dataset.color);
@@ -293,33 +333,10 @@ colorOptions.forEach(opt => {
   });
 });
 
-// اختيار اللون من الكول بيكر
+// اللون من الكول بيكر
 colorPicker.addEventListener("input", () => {
   setColor(colorPicker.value);
   closeSettings();
-});
-
-// تغيير اللون
-function setColor(color) {
-  document.documentElement.style.setProperty("--accent", color);
-  document.documentElement.style.setProperty("--accent-hover", color);
-  avatar.style.borderColor = color;
-  avatar.style.boxShadow = `0 0 25px ${color}, 0 0 4px rgba(255,255,255,.9) inset`;
-  buttons.forEach(btn => {
-    btn.style.background = color;
-    btn.style.boxShadow = `0 0 12px ${color}, 0 0 3px rgba(255,255,255,.7) inset`;
-  });
-}
-
-// تغيير حجم الصفحة بالكامل
-scaleInput.addEventListener("input", () => {
-  let scaleValue = scaleInput.value / 100;
-  wrap.style.transform = `scale(${scaleValue})`;
-  if(scaleValue > 1) {
-    document.body.style.overflowY = "auto";
-  } else {
-    document.body.style.overflowY = "hidden";
-  }
 });
 
 // دالة غلق القائمة
