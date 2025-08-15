@@ -1,152 +1,65 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>المصور علي الشمري</title>
-  <meta name="description" content="الصفحة الشخصية للمصور علي الشمري" />
-  <style>
-    :root{
-      --bg:#000;
-      --accent:#ffd400;
-      --accent-hover:#ffb000;
-      --text:#fff;
-      --sub:#9ed0ff;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Naskh Arabic UI", Tahoma, Arial, sans-serif;
-      overflow:hidden;
-    }
-    #snow{position:fixed;inset:0;z-index:0;}
-    .stars{
-      position:fixed;inset:0;z-index:0;
-      background-image:
-        radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.7) 50%, transparent 51%),
-        radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,.5) 50%, transparent 51%),
-        radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,.6) 50%, transparent 51%),
-        radial-gradient(1px 1px at 85% 25%, rgba(255,255,255,.6) 50%, transparent 51%),
-        radial-gradient(1px 1px at 10% 75%, rgba(255,255,255,.4) 50%, transparent 51%);
-      opacity:.7;
-      pointer-events:none;
-    }
-    .wrap{position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; min-height:100%; padding:40px 16px 32px; gap:16px}
-    .avatar{
-      width:min(45vw, 200px);
-      aspect-ratio:1/1;
-      border-radius:50%;
-      object-fit:cover;
-      border:3px solid #fff;
-      box-shadow:0 0 25px var(--accent), 0 0 4px rgba(255,255,255,.9) inset;
-      filter:saturate(1.05);
-      background:#222;
-    }
-    h1{
-      margin:4px 0 0;
-      font-size:clamp(18px, 4vw, 26px);
-      font-weight:800;
-      letter-spacing:.3px;
-      text-shadow:0 0 6px rgba(255,255,255,.15)
-    }
-    .btn{
-      display:block;
-      width:min(80vw, 500px);
-      background:var(--accent);
-      color:#000;
-      text-decoration:none;
-      font-weight:700;
-      padding:12px 20px;
-      margin:8px auto;
-      border-radius:999px;
-      box-shadow:0 0 20px var(--accent);
-      transition:transform .12s ease, box-shadow .2s ease, background .15s ease;
-      font-size:clamp(14px, 3vw, 20px);
-      text-align:center;
-    }
-    .btn:hover{
-      background:var(--accent-hover);
-      box-shadow:0 0 24px var(--accent-hover);
-      transform:translateY(-1px)
-    }
-    .btn:active{transform:translateY(0)}
-    .credit{opacity:.8; font-size:12px; margin-top:8px}
-    .spacer{height:30px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>المصور علي الشمري</title>
+<meta name="description" content="الصفحة الشخصية للمصور علي الشمري" />
+<style>
+:root{
+--bg:#000; --accent:#ffd400; --accent-hover:#ffb000; --text:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:system-ui,Segoe UI,Roboto,"Noto Naskh Arabic UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text);}
+#snow, .stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+.stars{background-image:
+radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.7) 50%, transparent 51%),
+radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,.5) 50%, transparent 51%),
+radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,.6) 50%, transparent 51%),
+radial-gradient(1px 1px at 85% 25%, rgba(255,255,255,.6) 50%, transparent 51%),
+radial-gradient(1px 1px at 10% 75%, rgba(255,255,255,.4) 50%, transparent 51%);
+opacity:.7;}
+.wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;padding:20px 10px;gap:10px;min-height:100%;}
+.avatar{width:min(35vw,150px);aspect-ratio:1/1;border-radius:50%;object-fit:cover;border:2px solid #fff;box-shadow:0 0 20px var(--accent);}
+h1{font-size:clamp(16px,3vw,22px);text-align:center;}
+.btn{display:block;width:90%;max-width:400px;background:var(--accent);color:#000;text-decoration:none;font-weight:700;padding:10px 15px;border-radius:50px;margin:4px 0;text-align:center;font-size:clamp(12px,2.5vw,18px);transition:all .2s;}
+.btn:hover{background:var(--accent-hover);box-shadow:0 0 15px var(--accent-hover);transform:translateY(-1px);}
+.credit{opacity:.8;font-size:12px;margin-top:6px;}
+.spacer{height:20px;}
+</style>
 </head>
 <body>
-  <div class="stars" aria-hidden="true"></div>
-  <canvas id="snow" aria-hidden="true"></canvas>
+<div class="stars" aria-hidden="true"></div>
+<canvas id="snow" aria-hidden="true"></canvas>
 
-  <main class="wrap">
-    <img class="avatar" src="myphoto.JPG" alt="صورة شخصية" />
+<main class="wrap">
+<img class="avatar" src="myphoto.JPG" alt="صورة شخصية" />
+<h1>المصور علي الشمري 📸</h1>
 
-    <h1>المصور علي الشمري 📸</h1>
+<a class="btn" href="https://t.me/AliPhoto25" target="_blank">All my works 🎯 📂</a>
+<a class="btn" href="https://www.instagram.com/1cc_c?igsh=MWR6dnU1YWxudmp4Zg==" target="_blank">Photography account 📸</a>
+<a class="btn" href="https://www.tiktok.com/@sh.di" target="_blank">Tik Tok 🎵</a>
+<a class="btn" href="https://www.youtube.com/@shmri25" target="_blank">YouTube ▶️</a>
+<a class="btn" href="https://www.facebook.com/share/1FHHbLJT6i/" target="_blank">Facebook account 📘</a>
+<a class="btn" href="https://www.facebook.com/share/16p6V6pzLw/" target="_blank">Facebook page 🌐</a>
 
-    <a class="btn" href="https://t.me/AliPhoto25" target="_blank" rel="noopener">All my works 🎯 📂</a>
-    <a class="btn" href="https://www.instagram.com/1cc_c?igsh=MWR6dnU1YWxudmp4Zg==" target="_blank" rel="noopener">Photography account 📸</a>
-    <a class="btn" href="https://www.tiktok.com/@sh.di" target="_blank" rel="noopener">Tik Tok 🎵</a>
-    <a class="btn" href="https://www.youtube.com/@shmri25" target="_blank" rel="noopener">YouTube ▶️</a>
-    <a class="btn" href="https://www.facebook.com/share/1FHHbLJT6i/" target="_blank" rel="noopener">Facebook account 📘</a>
-    <a class="btn" href="https://www.facebook.com/share/16p6V6pzLw/" target="_blank" rel="noopener">Facebook page 🌐</a>
+<button class="btn" onclick="togglePlay()">علي اميري</button>
+<audio id="player" src="علي أميري ونعم الأمير _ أجمل أنشودة(MP3_160K).mp3"></audio>
 
-    <button class="btn" onclick="togglePlay()">علي اميري</button>
-    <audio id="player" src="علي أميري ونعم الأمير _ أجمل أنشودة(MP3_160K).mp3"></audio>
+<div class="credit">© جميع الحقوق محفوظة لدى المصور علي الشمري</div>
+<div class="spacer"></div>
+</main>
 
-    <div class="credit">© جميع الحقوق محفوظة لدى المصور علي الشمري</div>
-    <div class="spacer"></div>
-  </main>
-
-  <script>
-    const player = document.getElementById('player');
-    function togglePlay(){
-      if(player.paused){
-        player.play();
-      } else {
-        player.pause();
-      }
-    }
-    (function(){
-      const c = document.getElementById('snow');
-      const ctx = c.getContext('2d');
-      let W, H, flakes=[];
-      function resize(){
-        W = c.width = window.innerWidth;
-        H = c.height = window.innerHeight;
-        const count = Math.floor((W*H)/15000);
-        flakes = Array.from({length:count},()=>spawn());
-      }
-      function spawn(){
-        return {
-          x: Math.random()*W,
-          y: Math.random()*H,
-          r: Math.random()*1.6 + 0.5,
-          s: Math.random()*0.5 + 0.2,
-          drift: Math.random()*0.5 + 0.15,
-          a: Math.random()*Math.PI*2
-        };
-      }
-      function step(){
-        ctx.clearRect(0,0,W,H);
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        for(let f of flakes){
-          f.y += f.s;
-          f.x += Math.cos(f.a+=0.01)*f.drift*0.6;
-          if(f.y>H+5){ f.y = -5; f.x = Math.random()*W; }
-          if(f.x<-5){ f.x = W+5; } else if(f.x>W+5){ f.x = -5; }
-          ctx.beginPath();
-          ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
-          ctx.fill();
-        }
-        requestAnimationFrame(step);
-      }
-      window.addEventListener('resize', resize);
-      resize();
-      step();
-    })();
-  </script>
+<script>
+const player=document.getElementById('player');
+function togglePlay(){player.paused?player.play():player.pause();}
+(function(){
+const c=document.getElementById('snow');const ctx=c.getContext('2d');let W,H,flakes=[];
+function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;flakes=Array.from({length:Math.floor((W*H)/15000)},()=>spawn());}
+function spawn(){return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.5,s:Math.random()*.5+.2,drift:Math.random()*.5+.15,a:Math.random()*Math.PI*2};}
+function step(){ctx.clearRect(0,0,W,H);ctx.fillStyle='rgba(255,255,255,0.9)';for(let f of flakes){f.y+=f.s;f.x+=Math.cos(f.a+=.01)*f.drift*.6;if(f.y>H+5){f.y=-5;f.x=Math.random()*W;}if(f.x<-5){f.x=W+5;}else if(f.x>W+5){f.x=-5;}ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fill();}requestAnimationFrame(step);}
+window.addEventListener('resize',resize);resize();step();
+})();
+</script>
 </body>
 </html>
