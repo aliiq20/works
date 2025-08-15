@@ -8,7 +8,8 @@
 <style>
 :root {
   --bg:#000;
-  --accent:#ff7f00; /* البرتقالي ثابت كبداية */
+  --accent:#ff7f00; /* لون البداية ثابت برتقالي */
+  --accent-hover:#ffb000;
   --text:#fff;
 }
 * {
@@ -84,8 +85,8 @@ h1 {
   box-shadow:0 0 12px var(--accent),0 0 3px rgba(255,255,255,.7) inset;
 }
 .btn:hover {
-  background:#ffb000;
-  box-shadow:0 0 18px #ffb000;
+  background:var(--accent-hover);
+  box-shadow:0 0 18px var(--accent-hover);
   transform:translateY(-1px);
 }
 .btn:active {
@@ -99,7 +100,6 @@ h1 {
 .spacer {
   height:23px;
 }
-
 /* زر الإعدادات */
 #settingsBtn {
   position:absolute;
@@ -117,7 +117,6 @@ h1 {
 #settingsBtn.active {
   background:#666;
 }
-
 /* قائمة الإعدادات مع الانيميشن */
 #settingsMenu {
   position:absolute;
@@ -144,21 +143,16 @@ h1 {
   color:#fff;
   font-size:14px;
 }
-#settingsMenu input[type=color]{
-  width:100%;
-  margin-bottom:10px;
-}
-#scaleWrapper {
-  display:flex;
-  align-items:center;
-  gap:5px;
-}
-#scaleInput {
+#settingsMenu input[type="color"] {
   width:100%;
 }
-#scaleValue {
-  min-width:30px;
+#settingsMenu input[type="range"] {
+  width:100%;
+}
+#sizeValue {
   text-align:center;
+  margin-top:3px;
+  font-size:14px;
   color:#fff;
 }
 </style>
@@ -167,30 +161,33 @@ h1 {
 <div class="stars" aria-hidden="true"></div>
 <canvas id="snow" aria-hidden="true"></canvas>
 
-<!-- زر الإعدادات -->
 <button id="settingsBtn">⚙️</button>
-
-<!-- قائمة الإعدادات -->
 <div id="settingsMenu">
-  <label>اختر اللون:</label>
-  <button class="colorBtn" data-color="#ff7f00" style="background:#ff7f00;">برتقالي</button>
-  <button class="colorBtn" data-color="#800080" style="background:#800080;">بنفسجي</button>
-  <button class="colorBtn" data-color="#964B00" style="background:#964B00;">جوزي</button>
-  <button class="colorBtn" data-color="#C2B280" style="background:#C2B280;">صحراوي</button>
-  <button class="colorBtn" data-color="#808080" style="background:#808080;">رمادي</button>
-  <button id="rgbBtn" class="colorBtn">RGB متدرج</button>
-
-  <label>حجم الصورة:</label>
-  <div id="scaleWrapper">
-    <input type="range" id="scaleInput" min="50" max="150" value="100">
-    <span id="scaleValue">100%</span>
-  </div>
+  <label>
+    اختر اللون:
+    <input type="color" id="colorPicker" value="#ff7f00">
+  </label>
+  <label>
+    حجم الصورة:
+    <input type="range" id="scaleSlider" min="50" max="150" value="100">
+    <div id="sizeValue">100%</div>
+  </label>
+  <label>
+    ألوان جاهزة:
+    <select id="presetColors">
+      <option value="#ff7f00">برتقالي</option>
+      <option value="#800080">بنفسجي</option>
+      <option value="#964B00">جوزي</option>
+      <option value="#C2B280">صحراوي</option>
+      <option value="#808080">رمادي</option>
+    </select>
+  </label>
 </div>
 
 <main class="wrap">
   <img class="avatar" src="myphoto.JPG" alt="صورة شخصية" />
   <h1>المصور علي الشمري 📸</h1>
-  
+
   <a class="btn" href="https://t.me/AliPhoto25" target="_blank" rel="noopener">All my works 🎯 📂</a>
   <a class="btn" href="https://www.instagram.com/1cc_c?igsh=MWR6dnU1YWxudmp4Zg==" target="_blank" rel="noopener">Photography account 📸</a>
   <a class="btn" href="https://www.tiktok.com/@sh.di" target="_blank" rel="noopener">Tik Tok 🎵</a>
@@ -219,20 +216,18 @@ function togglePlay() {
   function resize(){
     W=c.width=window.innerWidth;
     H=c.height=window.innerHeight;
-    const count = Math.floor((W*H)/15000);
+    const count=Math.floor((W*H)/15000);
     flakes=Array.from({length:count},()=>spawn());
   }
-  function spawn(){
-    return {x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6 +0.5,s:Math.random()*0.5+0.2,drift:Math.random()*0.5+0.15,a:Math.random()*Math.PI*2};
-  }
+  function spawn(){ return {x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+0.5,s:Math.random()*0.5+0.2,drift:Math.random()*0.5+0.15,a:Math.random()*Math.PI*2};}
   function step(){
     ctx.clearRect(0,0,W,H);
     ctx.fillStyle='rgba(255,255,255,0.9)';
     for(let f of flakes){
       f.y+=f.s;
       f.x+=Math.cos(f.a+=0.01)*f.drift*0.6;
-      if(f.y>H+5){ f.y=-5; f.x=Math.random()*W;}
-      if(f.x<-5){f.x=W+5;}else if(f.x>W+5){f.x=-5;}
+      if(f.y>H+5){f.y=-5;f.x=Math.random()*W;}
+      if(f.x<-5){f.x=W+5;} else if(f.x>W+5){f.x=-5;}
       ctx.beginPath();
       ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
       ctx.fill();
@@ -240,8 +235,7 @@ function togglePlay() {
     requestAnimationFrame(step);
   }
   window.addEventListener('resize',resize);
-  resize();
-  step();
+  resize(); step();
 })();
 
 // إعدادات
@@ -249,16 +243,36 @@ const avatar = document.querySelector(".avatar");
 const buttons = document.querySelectorAll(".btn");
 const settingsBtn = document.getElementById("settingsBtn");
 const settingsMenu = document.getElementById("settingsMenu");
-const scaleInput = document.getElementById("scaleInput");
-const scaleValue = document.getElementById("scaleValue");
-const colorBtns = document.querySelectorAll(".colorBtn");
-let rgbInterval = null;
+const colorPicker = document.getElementById("colorPicker");
+const scaleSlider = document.getElementById("scaleSlider");
+const sizeValue = document.getElementById("sizeValue");
+const presetColors = document.getElementById("presetColors");
 
 // فتح/إغلاق القائمة
 settingsBtn.addEventListener("click",()=>{
-  if(settingsMenu.classList.contains("show")){
-    closeSettings();
-  }else{
-    settingsMenu.style.display="block";
-    setTimeout(()=>settingsMenu.classList.add("show"),10);
-    settingsBtn.classList.add("active
+  if(settingsMenu.classList.contains("show")){ closeSettings(); }
+  else{ settingsMenu.style.display="block"; setTimeout(()=>settingsMenu.classList.add("show"),10); settingsBtn.classList.add("active"); }
+});
+document.addEventListener("click",(e)=>{
+  if(!settingsMenu.contains(e.target) && e.target!==settingsBtn){ closeSettings(); }
+});
+function closeSettings(){
+  settingsMenu.classList.remove("show");
+  settingsBtn.classList.remove("active");
+  setTimeout(()=>settingsMenu.style.display="none",250);
+}
+
+// تغيير اللون عند اختيار اللون اليدوي
+colorPicker.addEventListener("input",()=>{
+  setAccent(colorPicker.value);
+});
+
+// تغيير اللون عند اختيار قائمة الألوان الجاهزة
+presetColors.addEventListener("change",()=>{
+  colorPicker.value=presetColors.value;
+  setAccent(presetColors.value);
+});
+
+// سلايدر الحجم
+scaleSlider.addEventListener("input",()=>{
+  avatar.style.width
