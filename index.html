@@ -12,6 +12,16 @@
   --accent-hover:#ffb000;
   --text:#fff;
 }
+
+/* أنيميشن متدرج ألوان RGB */
+@keyframes rgbGradient {
+  0% { --accent: rgb(255,0,0); }
+  25% { --accent: rgb(0,255,0); }
+  50% { --accent: rgb(0,0,255); }
+  75% { --accent: rgb(255,0,255); }
+  100% { --accent: rgb(255,0,0); }
+}
+
 * {
   box-sizing:border-box;
   margin:0;
@@ -22,7 +32,8 @@ html, body {
   font-family:system-ui,Segoe UI,Roboto,"Noto Naskh Arabic UI",Tahoma,Arial,sans-serif;
   background:var(--bg);
   color:var(--text);
-  overflow:hidden;
+  overflow-x:hidden;
+  animation: rgbGradient 8s infinite linear;
 }
 #snow, .stars {
   position:fixed;
@@ -49,10 +60,12 @@ html, body {
   min-height:100%;
   padding:23px 11px;
   gap:11px;
+  transform-origin: top center;
+  transition: transform 0.3s ease;
 }
 .avatar {
   width:40%;
-  max-width:200px;
+  max-width:172px;
   aspect-ratio:1/1;
   border-radius:50%;
   object-fit:cover;
@@ -62,7 +75,7 @@ html, body {
 }
 h1 {
   margin:4px 0 0;
-  font-size:clamp(18px,4vw,28px);
+  font-size:clamp(18px,3.45vw,25px);
   font-weight:800;
   letter-spacing:.3px;
   text-shadow:0 0 6px rgba(255,255,255,.15);
@@ -100,62 +113,60 @@ h1 {
 .spacer {
   height:23px;
 }
-
 /* زر الإعدادات */
 #settingsBtn {
-  position:absolute;
-  top:15px;
-  left:15px;
-  background:#444;
-  color:#fff;
-  border:none;
-  padding:6px 10px;
-  border-radius:8px;
-  cursor:pointer;
-  z-index:10;
-  transition:background 0.2s;
+position:absolute;
+top:15px;
+left:15px;
+background:#444;
+color:#fff;
+border:none;
+padding:6px 10px;
+border-radius:8px;
+cursor:pointer;
+z-index:10;
+transition:background 0.2s;
 }
 #settingsBtn.active {
-  background:#666;
+background:#666;
 }
-
-/* قائمة الإعدادات مع الانيميشن */
+/* قائمة الإعدادات */
 #settingsMenu {
-  position:absolute;
-  top:50px;
-  left:15px;
-  background:#222;
-  padding:10px;
-  border-radius:8px;
-  display:none;
-  z-index:10;
-  width:170px;
-  opacity:0;
-  transform:translateY(-10px);
-  transition:opacity 0.25s ease, transform 0.25s ease;
+position:absolute;
+top:50px;
+left:15px;
+background:#222;
+padding:10px;
+border-radius:8px;
+display:none;
+z-index:10;
+width:180px;
+opacity:0;
+transform:translateY(-10px);
+transition:opacity 0.25s ease, transform 0.25s ease;
 }
 #settingsMenu.show {
-  display:block;
-  opacity:1;
-  transform:translateY(0);
+display:block;
+opacity:1;
+transform:translateY(0);
 }
 #settingsMenu label {
-  display:block;
-  margin-bottom:8px;
-  color:#fff;
-  font-size:14px;
+display:block;
+margin-bottom:8px;
+color:#fff;
+font-size:14px;
 }
-#settingsMenu input, #settingsMenu button.color-btn {
-  width:100%;
-  margin-bottom:6px;
-  cursor:pointer;
-  border:none;
-  padding:6px 0;
-  border-radius:5px;
+#settingsMenu input {
+width:100%;
 }
-button.color-btn {
-  color:#fff;
-  font-weight:700;
+.color-option {
+display:inline-block;
+width:20px;
+height:20px;
+border-radius:50%;
+margin:2px;
+cursor:pointer;
+border:1px solid #fff;
 }
 </style>
 </head>
@@ -163,28 +174,29 @@ button.color-btn {
 <div class="stars" aria-hidden="true"></div>
 <canvas id="snow" aria-hidden="true"></canvas>
 
+<!-- زر الإعدادات -->
 <button id="settingsBtn">⚙️</button>
 
+<!-- قائمة الإعدادات -->
 <div id="settingsMenu">
-  <label>
-    اختر اللون:
+  <label>اختر اللون:</label>
+  <div>
+    <span class="color-option" data-color="#ffa500" style="background:#ffa500;"></span>
+    <span class="color-option" data-color="#800080" style="background:#800080;"></span>
+    <span class="color-option" data-color="#8B4513" style="background:#8B4513;"></span>
+    <span class="color-option" data-color="#C2B280" style="background:#C2B280;"></span>
+    <span class="color-option" data-color="#808080" style="background:#808080;"></span>
     <input type="color" id="colorPicker" value="#ffd400">
-  </label>
-  <button class="color-btn" data-color="#ff6600">برتقالي</button>
-  <button class="color-btn" data-color="#800080">بنفسجي</button>
-  <button class="color-btn" data-color="#d2691e">جوزي</button>
-  <button class="color-btn" data-color="#c2b280">صحراوي</button>
-  <button class="color-btn" data-color="#808080">رمادي</button>
+  </div>
   <label>
-    حجم الصورة (%):
-    <input type="number" id="scaleInput" min="50" max="150" value="100">
+    حجم الصفحة (%):
+    <input type="number" id="scaleInput" min="50" max="600" value="100">
   </label>
 </div>
 
 <main class="wrap">
   <img class="avatar" src="myphoto.JPG" alt="صورة شخصية" />
   <h1>المصور علي الشمري 📸</h1>
-
   <a class="btn" href="https://t.me/AliPhoto25" target="_blank" rel="noopener">All my works 🎯 📂</a>
   <a class="btn" href="https://www.instagram.com/1cc_c?igsh=MWR6dnU1YWxudmp4Zg==" target="_blank" rel="noopener">Photography account 📸</a>
   <a class="btn" href="https://www.tiktok.com/@sh.di" target="_blank" rel="noopener">Tik Tok 🎵</a>
@@ -246,13 +258,14 @@ function togglePlay() {
 })();
 
 // إعدادات
+const wrap = document.querySelector(".wrap");
 const avatar = document.querySelector(".avatar");
 const buttons = document.querySelectorAll(".btn");
 const settingsBtn = document.getElementById("settingsBtn");
 const settingsMenu = document.getElementById("settingsMenu");
 const colorPicker = document.getElementById("colorPicker");
 const scaleInput = document.getElementById("scaleInput");
-const colorBtns = document.querySelectorAll(".color-btn");
+const colorOptions = document.querySelectorAll(".color-option");
 
 // فتح/إغلاق القائمة
 settingsBtn.addEventListener("click", () => {
@@ -272,9 +285,24 @@ document.addEventListener("click", (e) => {
   }
 });
 
+// اختيار الألوان الجاهزة
+colorOptions.forEach(opt => {
+  opt.addEventListener("click", () => {
+    setColor(opt.dataset.color);
+    closeSettings();
+  });
+});
+
+// اختيار اللون من الكول بيكر
+colorPicker.addEventListener("input", () => {
+  setColor(colorPicker.value);
+  closeSettings();
+});
+
 // تغيير اللون
-function setColor(color){
+function setColor(color) {
   document.documentElement.style.setProperty("--accent", color);
+  document.documentElement.style.setProperty("--accent-hover", color);
   avatar.style.borderColor = color;
   avatar.style.boxShadow = `0 0 25px ${color}, 0 0 4px rgba(255,255,255,.9) inset`;
   buttons.forEach(btn => {
@@ -282,33 +310,24 @@ function setColor(color){
     btn.style.boxShadow = `0 0 12px ${color}, 0 0 3px rgba(255,255,255,.7) inset`;
   });
 }
-colorPicker.addEventListener("input", () => { setColor(colorPicker.value); closeSettings(); });
-colorBtns.forEach(btn => {
-  btn.addEventListener("click", () => { setColor(btn.dataset.color); closeSettings(); });
-});
 
-// تغيير الحجم
+// تغيير حجم الصفحة بالكامل
 scaleInput.addEventListener("input", () => {
-  const scale = scaleInput.value;
-  avatar.style.width = `${scale}%`;
+  let scaleValue = scaleInput.value / 100;
+  wrap.style.transform = `scale(${scaleValue})`;
+  if(scaleValue > 1) {
+    document.body.style.overflowY = "auto";
+  } else {
+    document.body.style.overflowY = "hidden";
+  }
 });
 
-// غلق القائمة
+// دالة غلق القائمة
 function closeSettings(){
   settingsMenu.classList.remove("show");
   settingsBtn.classList.remove("active");
   setTimeout(() => settingsMenu.style.display = "none", 250);
 }
-
-// لون RGB متغير تلقائي
-let r=255,g=0,b=0;
-setInterval(()=>{
-  r = Math.floor(Math.random()*256);
-  g = Math.floor(Math.random()*256);
-  b = Math.floor(Math.random()*256);
-  const rgb = `rgb(${r},${g},${b})`;
-  setColor(rgb);
-},2000);
 </script>
 </body>
 </html>
