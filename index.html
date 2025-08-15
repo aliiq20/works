@@ -52,7 +52,7 @@ html, body {
 }
 .avatar {
   width:40%;
-  max-width:172px;
+  max-width:200px;
   aspect-ratio:1/1;
   border-radius:50%;
   object-fit:cover;
@@ -62,7 +62,7 @@ html, body {
 }
 h1 {
   margin:4px 0 0;
-  font-size:clamp(18px,3.45vw,25px);
+  font-size:clamp(18px,4vw,28px);
   font-weight:800;
   letter-spacing:.3px;
   text-shadow:0 0 6px rgba(255,255,255,.15);
@@ -129,7 +129,7 @@ h1 {
   border-radius:8px;
   display:none;
   z-index:10;
-  width:150px;
+  width:170px;
   opacity:0;
   transform:translateY(-10px);
   transition:opacity 0.25s ease, transform 0.25s ease;
@@ -145,8 +145,17 @@ h1 {
   color:#fff;
   font-size:14px;
 }
-#settingsMenu input {
+#settingsMenu input, #settingsMenu button.color-btn {
   width:100%;
+  margin-bottom:6px;
+  cursor:pointer;
+  border:none;
+  padding:6px 0;
+  border-radius:5px;
+}
+button.color-btn {
+  color:#fff;
+  font-weight:700;
 }
 </style>
 </head>
@@ -154,15 +163,18 @@ h1 {
 <div class="stars" aria-hidden="true"></div>
 <canvas id="snow" aria-hidden="true"></canvas>
 
-<!-- زر الإعدادات -->
 <button id="settingsBtn">⚙️</button>
 
-<!-- قائمة الإعدادات -->
 <div id="settingsMenu">
   <label>
     اختر اللون:
     <input type="color" id="colorPicker" value="#ffd400">
   </label>
+  <button class="color-btn" data-color="#ff6600">برتقالي</button>
+  <button class="color-btn" data-color="#800080">بنفسجي</button>
+  <button class="color-btn" data-color="#d2691e">جوزي</button>
+  <button class="color-btn" data-color="#c2b280">صحراوي</button>
+  <button class="color-btn" data-color="#808080">رمادي</button>
   <label>
     حجم الصورة (%):
     <input type="number" id="scaleInput" min="50" max="150" value="100">
@@ -240,6 +252,7 @@ const settingsBtn = document.getElementById("settingsBtn");
 const settingsMenu = document.getElementById("settingsMenu");
 const colorPicker = document.getElementById("colorPicker");
 const scaleInput = document.getElementById("scaleInput");
+const colorBtns = document.querySelectorAll(".color-btn");
 
 // فتح/إغلاق القائمة
 settingsBtn.addEventListener("click", () => {
@@ -260,8 +273,7 @@ document.addEventListener("click", (e) => {
 });
 
 // تغيير اللون
-colorPicker.addEventListener("input", () => {
-  const color = colorPicker.value;
+function setColor(color){
   document.documentElement.style.setProperty("--accent", color);
   avatar.style.borderColor = color;
   avatar.style.boxShadow = `0 0 25px ${color}, 0 0 4px rgba(255,255,255,.9) inset`;
@@ -269,22 +281,34 @@ colorPicker.addEventListener("input", () => {
     btn.style.background = color;
     btn.style.boxShadow = `0 0 12px ${color}, 0 0 3px rgba(255,255,255,.7) inset`;
   });
-  closeSettings();
+}
+colorPicker.addEventListener("input", () => { setColor(colorPicker.value); closeSettings(); });
+colorBtns.forEach(btn => {
+  btn.addEventListener("click", () => { setColor(btn.dataset.color); closeSettings(); });
 });
 
 // تغيير الحجم
 scaleInput.addEventListener("input", () => {
   const scale = scaleInput.value;
   avatar.style.width = `${scale}%`;
-  closeSettings();
 });
 
-// دالة غلق القائمة
+// غلق القائمة
 function closeSettings(){
   settingsMenu.classList.remove("show");
   settingsBtn.classList.remove("active");
   setTimeout(() => settingsMenu.style.display = "none", 250);
 }
+
+// لون RGB متغير تلقائي
+let r=255,g=0,b=0;
+setInterval(()=>{
+  r = Math.floor(Math.random()*256);
+  g = Math.floor(Math.random()*256);
+  b = Math.floor(Math.random()*256);
+  const rgb = `rgb(${r},${g},${b})`;
+  setColor(rgb);
+},2000);
 </script>
 </body>
 </html>
