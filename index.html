@@ -331,7 +331,7 @@ input[type="file"] { color: #fff; }
 
 <!-- زر الإعدادات -->
 <button id="settingsBtn">⚙️</button>
-<button id="adminBtn">🔒 لوحة التحكم</button>
+<button id="adminBtn">🔒 تمت البرمجة بواسطة @x4.x5</button>
 
 <!-- قائمة الإعدادات -->
 <div id="settingsMenu">
@@ -440,7 +440,7 @@ input[type="file"] { color: #fff; }
 
 // ====== CONFIG ======
 const STORAGE_KEY = "vc_gallery_data";
-const ADMIN_PASSWORD = "1234"; // <-- غيّرها إذا تريد. الحماية هنا بسيطة (بالمتصفح فقط).
+const ADMIN_PASSWORD = "a.m.m2001"; // <-- غيّرها إذا تريد. الحماية هنا بسيطة (بالمتصفح فقط).
 
 // ====== DOM ======
 const galleryEl = document.getElementById("gallery");
@@ -544,7 +544,8 @@ lightbox.addEventListener("click", (e)=> { if(e.target === lightbox) lightbox.cl
 
 // ====== ADMIN UI ======
 function promptPassword(){
-  const p = prompt("ادخل كلمة المرور للوصول للوحة التحكم:");
+  const p = prompt(" هااا تريد تدخل 😂
+متكدر لاتحاول:");
   if(p === null) return false;
   return p === ADMIN_PASSWORD;
 }
