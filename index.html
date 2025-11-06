@@ -68,7 +68,6 @@ html, body {
   border:2px solid var(--accent);
   box-shadow:0 0 25px var(--accent),0 0 4px rgba(255,255,255,.9) inset;
   transition:all .3s ease;
-  cursor:pointer; /* مهم: نستخدم نقرات على الصورة للتفعيل */
 }
 h1 {
   margin:4px 0 0;
@@ -234,7 +233,7 @@ border:1px solid #fff;
 }
 .small { font-size:12px; opacity:0.85; }
 
-/* Admin button top-right (مخفي افتراضياً) */
+/* Admin button top-right */
 #adminBtn {
   position:absolute;
   top:15px;
@@ -246,7 +245,6 @@ border:1px solid #fff;
   border-radius:8px;
   cursor:pointer;
   z-index:10;
-  display:none; /* مخفي افتراضياً */
 }
 
 /* Admin modal */
@@ -355,7 +353,7 @@ input[type="file"] { color: #fff; }
 </div>
 
 <main class="wrap">
-  <img id="avatarImg" class="avatar" src="myphoto.JPG" alt="صورة شخصية" title="انقر 3 مرات للتفعيل (لصاحب الكود فقط)" />
+  <img class="avatar" src="myphoto.JPG" alt="صورة شخصية" />
   <h1>المصور علي الشمري 📸</h1>
   <a class="btn" href="https://t.me/AliPhoto25" target="_blank" rel="noopener">جميع اعمالي 🎯 📂</a>
   <a class="btn" href="https://www.instagram.com/1cc_c?igsh=MWR6dnU1YWxudmp4Zg==" target="_blank" rel="noopener">حساب التصوير📸</a>
@@ -383,8 +381,8 @@ input[type="file"] { color: #fff; }
     </div>
 
     <div class="row">
-      <label class="small-muted">كلمة المرور: (محفوظة بشكل مشفّر في متصفحك)</label>
-      <div class="small-muted">إذا نسيت كلمة المرور، احذف مفاتيح الـ localStorage الخاصة بهذه الصفحة وأعد تفعيلها عبر التفعيل الثلاثي على الصورة.</div>
+      <label class="small-muted">كلمة المرور: (محمية بالمتصفح فقط)</label>
+      <div class="small-muted">تغيير كلمة المرور داخل الكود المتغير <code>ADMIN_PASSWORD</code></div>
     </div>
 
     <div style="border-top:1px solid rgba(255,255,255,0.04);padding-top:10px;margin-top:8px;">
@@ -427,22 +425,22 @@ input[type="file"] { color: #fff; }
 
 <script>
 /* ===========================
-   ADMIN / GALLERY LOGIC (معدّل لحماية الزر)
+   ADMIN / GALLERY LOGIC
    ===========================
    - تخزين المحتوى في localStorage تحت المفتاح "vc_gallery_data"
-   - إضافة نظام تفعيل محلي: triple-click على الصورة لعمل "تفعيل المالك"
-   - يتم تخزين:
-       localStorage.setItem('vc_admin_owner','true');
-       localStorage.setItem('vc_admin_pwd_hash', '<sha256 hex>')
-     فقط في متصفح المالك.
-   - عند فتح الصفحة، الزر admin يظهَر فقط إن vc_admin_owner === 'true'
-   - كل عمليات لوحة التحكم تتطلب تحقق عبر إدخال كلمة المرور ومقارنتها مع الـ hash
+   - هيكل البيانات:
+   {
+     categories: {
+       "مجلد 1": { items: [ {id, type:"image"|"video", title, data, date} , ... ] },
+       ...
+     }
+   }
+   - ملاحظة: تخزين الفيديو كـ dataURL قد يصل للحدود بسرعة.
 */
 
 // ====== CONFIG ======
 const STORAGE_KEY = "vc_gallery_data";
-const OWNER_FLAG_KEY = "vc_admin_owner";
-const PWD_HASH_KEY = "vc_admin_pwd_hash";
+const ADMIN_PASSWORD = "1234"; // <-- غيّرها إذا تريد. الحماية هنا بسيطة (بالمتصفح فقط).
 
 // ====== DOM ======
 const galleryEl = document.getElementById("gallery");
@@ -464,8 +462,6 @@ const clearAllBtn = document.getElementById("clearAllBtn");
 const lightbox = document.getElementById("lightbox");
 const lightboxContent = document.getElementById("lightboxContent");
 const lightboxClose = document.getElementById("lightboxClose");
-
-const avatarImg = document.getElementById('avatarImg');
 
 // ====== helpers ======
 function uid() { return 'id-' + Math.random().toString(36).slice(2,10); }
@@ -547,75 +543,16 @@ lightboxClose.addEventListener("click", ()=> lightbox.classList.remove("show"));
 lightbox.addEventListener("click", (e)=> { if(e.target === lightbox) lightbox.classList.remove("show"); });
 
 // ====== ADMIN UI ======
-// Helper: hash string with SHA-256 and return hex
-async function sha256Hex(str){
-  const enc = new TextEncoder();
-  const data = enc.encode(str);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  // convert to hex
-  const hex = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
-  return hex;
+function promptPassword(){
+  const p = prompt("ادخل كلمة المرور للوصول للوحة التحكم:");
+  if(p === null) return false;
+  return p === ADMIN_PASSWORD;
 }
-
-// Check if owner flag exists -> show admin button only in that browser
-function checkShowAdminButton(){
-  try{
-    const owner = localStorage.getItem(OWNER_FLAG_KEY);
-    if(owner === 'true'){
-      adminBtn.style.display = "block";
-    } else {
-      adminBtn.style.display = "none";
-    }
-  }catch(e){
-    adminBtn.style.display = "none";
-  }
-}
-
-// TRIPLE CLICK ON AVATAR TO ACTIVATE OWNER (خاص بصاحب الكود)
-// السبب: نريد طريقة بسيطة وسرية لتفعيل اللوحة فقط عند الرافع.
-let clickCount = 0;
-let clickTimer = null;
-avatarImg.addEventListener('click', async () => {
-  clickCount++;
-  if(clickTimer) clearTimeout(clickTimer);
-  clickTimer = setTimeout(()=>{ clickCount = 0; }, 800);
-  if(clickCount >= 3){
-    clickCount = 0;
-    // بدء عملية التفعيل / ضبط كلمة المرور
-    const existing = localStorage.getItem(PWD_HASH_KEY);
-    if(existing){
-      const change = confirm("مفتاح مالك موجود. تريد تغيير كلمة المرور؟");
-      if(!change) return;
-    }
-    // طلب كلمة المرور مرتين
-    const pass1 = prompt("ادخل كلمة مرور جديدة للوصول للوحة التحكم (ليست محفوظة نصًا، سيتم تشفيرها).");
-    if(!pass1) { alert("تم الإلغاء."); return; }
-    const pass2 = prompt("أعد إدخال كلمة المرور للتأكيد:");
-    if(pass2 !== pass1){ alert("كلمات المرور غير متطابقة. جرب مرة ثانية."); return; }
-    // خزّن الـ hash وعلّم المالك
-    const h = await sha256Hex(pass1);
-    localStorage.setItem(PWD_HASH_KEY, h);
-    localStorage.setItem(OWNER_FLAG_KEY, 'true');
-    alert("تم تفعيل لوحة التحكم في هذا المتصفح. الآن زر 'لوحة التحكم' سيظهر هنا.");
-    checkShowAdminButton();
-  }
-});
-
-// عند الضغط على زر admin => نتحقق من كلمة المرور
 adminBtn.addEventListener("click", async ()=>{
-  const storedHash = localStorage.getItem(PWD_HASH_KEY);
-  if(!storedHash){
-    alert("لم يتم تفعيل لوحة التحكم في هذا المتصفح.");
+  if(!promptPassword()){
+    alert("كلمة المرور خطأ.");
     return;
   }
-  const p = prompt("رجاءً أدخل كلمة المرور للوصول للوحة التحكم:");
-  if(p === null) return;
-  const h = await sha256Hex(p);
-  if(h !== storedHash){
-    alert("كلمة المرور خاطئة.");
-    return;
-  }
-  // تم التحقق
   openAdmin();
 });
 
@@ -639,10 +576,7 @@ function populateCategorySelect(){
   });
 }
 
-createCategoryBtn.addEventListener("click", async ()=>{
-  // تأكد من الدخول
-  const ok = await ensureAuthenticated();
-  if(!ok) return;
+createCategoryBtn.addEventListener("click", ()=>{
   const name = newCategoryName.value.trim();
   if(!name){ alert("ادخل اسم مجلد صحيح."); return; }
   const data = loadData();
@@ -655,8 +589,6 @@ createCategoryBtn.addEventListener("click", async ()=>{
 });
 
 uploadBtn.addEventListener("click", async ()=>{
-  const authed = await ensureAuthenticated();
-  if(!authed) return;
   const files = fileInput.files;
   if(!files || files.length===0){ alert("اختر ملفاً واحداً على الأقل للرفع."); return; }
 
@@ -673,7 +605,7 @@ uploadBtn.addEventListener("click", async ()=>{
 
   // read each file as dataURL
   for(const f of files){
-    // warn if file too big (>6MB)
+    // warn if file too big (>5MB)
     if(f.size > 6 * 1024 * 1024){
       const ok = confirm(`الملف "${f.name}" حجمه كبير (${Math.round(f.size/1024/1024)}MB). التخزين في المتصفح قد يفشل. تابع؟`);
       if(!ok) continue;
@@ -717,9 +649,7 @@ function renderAdminContent(){
     const title = document.createElement("div"); title.textContent=cat; title.style.fontWeight="800";
     const actions = document.createElement("div");
     const delCatBtn = document.createElement("button"); delCatBtn.className="action-danger"; delCatBtn.textContent="حذف المجلد";
-    delCatBtn.addEventListener("click", async ()=>{
-      const authed = await ensureAuthenticated();
-      if(!authed) return;
+    delCatBtn.addEventListener("click", ()=>{
       if(!confirm(`هل تريد حذف المجلد "${cat}" وكل محتواه؟ هذا حذف نهائي.`)) return;
       const d = loadData(); delete d.categories[cat]; saveData(d); populateCategorySelect(); renderAdminContent(); renderGallery();
     });
@@ -740,16 +670,12 @@ function renderAdminContent(){
       card.appendChild(thumb);
       const info = document.createElement("div"); info.style.display="flex"; info.style.justifyContent="space-between"; info.style.alignItems="center";
       const t = document.createElement("input"); t.value = item.title || ""; t.className="input"; t.style.flex="1"; t.style.marginLeft="6px";
-      t.addEventListener("change", async ()=>{
-        const authed = await ensureAuthenticated();
-        if(!authed) { renderAdminContent(); return; }
+      t.addEventListener("change", ()=>{
         const d = loadData(); const list = d.categories[cat].items; const idx = list.findIndex(x=>x.id===item.id);
         if(idx>=0){ d.categories[cat].items[idx].title = t.value; saveData(d); renderGallery(); renderAdminContent(); }
       });
       const del = document.createElement("button"); del.textContent="حذف"; del.className="action-danger";
-      del.addEventListener("click", async ()=>{
-        const authed = await ensureAuthenticated();
-        if(!authed) return;
+      del.addEventListener("click", ()=>{
         if(!confirm("حذف الملف نهائي؟")) return;
         const d = loadData(); d.categories[cat].items = d.categories[cat].items.filter(x=>x.id !== item.id); saveData(d); renderAdminContent(); renderGallery();
       });
@@ -764,9 +690,7 @@ function renderAdminContent(){
 }
 
 // EXPORT / IMPORT / CLEAR
-exportBtn.addEventListener("click", async ()=>{
-  const authed = await ensureAuthenticated();
-  if(!authed) return;
+exportBtn.addEventListener("click", ()=>{
   const data = loadData();
   const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
@@ -774,11 +698,7 @@ exportBtn.addEventListener("click", async ()=>{
   setTimeout(()=>URL.revokeObjectURL(url), 2000);
 });
 
-importBtn.addEventListener("click", async ()=> {
-  const authed = await ensureAuthenticated();
-  if(!authed) return;
-  importFile.click();
-});
+importBtn.addEventListener("click", ()=> importFile.click());
 importFile.addEventListener("change", async (e)=>{
   const f = e.target.files[0];
   if(!f) return;
@@ -798,41 +718,15 @@ importFile.addEventListener("change", async (e)=>{
   importFile.value = "";
 });
 
-clearAllBtn.addEventListener("click", async ()=>{
-  const authed = await ensureAuthenticated();
-  if(!authed) return;
+clearAllBtn.addEventListener("click", ()=>{
   if(!confirm("هل تريد مسح كل البيانات؟ هذا حذف نهائي.")) return;
   localStorage.removeItem(STORAGE_KEY);
   populateCategorySelect(); renderAdminContent(); renderGallery();
   alert("تم المسح.");
 });
 
-// ====== Authentication helpers ======
-async function ensureAuthenticated(){
-  // تحقق من أن المالك مفعل
-  const owner = localStorage.getItem(OWNER_FLAG_KEY);
-  if(owner !== 'true'){
-    alert("لم تقم بتفعيل لوحة التحكم في هذا المتصفح. للتفعيل: اضغط 3 مرات بسرعة على الصورة الشخصية واتبع التعليمات.");
-    return false;
-  }
-  const storedHash = localStorage.getItem(PWD_HASH_KEY);
-  if(!storedHash){
-    alert("لا توجد كلمة مرور محفوظة. فعّل اللوحة أولًا عبر الصورة الشخصية.");
-    return false;
-  }
-  const p = prompt("أدخل كلمة المرور للمصادقة:");
-  if(p === null) return false;
-  const h = await sha256Hex(p);
-  if(h !== storedHash){
-    alert("كلمة المرور خاطئة.");
-    return false;
-  }
-  return true;
-}
-
 // initial render
 renderGallery();
-checkShowAdminButton();
 
 /* ===========================
    باقي الكود (إعدادات، ثلج، صوت) محفوظ كما كان
