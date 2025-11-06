@@ -234,6 +234,7 @@ border:1px solid #fff;
 .small { font-size:12px; opacity:0.85; }
 
 /* Admin button top-right */
+/* OWNER-LIMIT: hidden by default; will be shown only when localStorage has owner token */
 #adminBtn {
   position:absolute;
   top:15px;
@@ -245,6 +246,7 @@ border:1px solid #fff;
   border-radius:8px;
   cursor:pointer;
   z-index:10;
+  display:none; /* <-- مخفي افتراضياً */
 }
 
 /* Admin modal */
@@ -435,7 +437,6 @@ input[type="file"] { color: #fff; }
        ...
      }
    }
-   - ملاحظة: تخزين الفيديو كـ dataURL قد يصل للحدود بسرعة.
 */
 
 // ====== CONFIG ======
@@ -462,6 +463,21 @@ const clearAllBtn = document.getElementById("clearAllBtn");
 const lightbox = document.getElementById("lightbox");
 const lightboxContent = document.getElementById("lightboxContent");
 const lightboxClose = document.getElementById("lightboxClose");
+
+// ====== OWNER-LIMIT: show adminBtn only if this localStorage key exists ======
+(function ownerCheck(){
+  try {
+    const token = localStorage.getItem('vc_owner_token');
+    if(token){
+      // if token exists, reveal admin button (only in this browser)
+      adminBtn.style.display = 'block';
+    } else {
+      adminBtn.style.display = 'none';
+    }
+  } catch(e){
+    adminBtn.style.display = 'none';
+  }
+})();
 
 // ====== helpers ======
 function uid() { return 'id-' + Math.random().toString(36).slice(2,10); }
@@ -492,7 +508,7 @@ function renderGallery(){
   galleryEl.innerHTML = "";
   const cats = Object.keys(data.categories || {});
   if(cats.length === 0){
-    galleryEl.innerHTML = '<div class="small-muted" style="padding:12px;text-align:center;">ماكو محتوى بعد، سجل دخولك للوصول للوحة وتحميل أعمالك.</div>';
+    galleryEl.innerHTML = '<div class="small-muted" style="padding:12px;text-align:center;"></div>';
     return;
   }
   for(const cat of cats){
@@ -549,6 +565,12 @@ function promptPassword(){
   return p === ADMIN_PASSWORD;
 }
 adminBtn.addEventListener("click", async ()=>{
+  // double-check owner token exists in this browser (prevents showing modal if someone forged adminBtn)
+  const token = localStorage.getItem('vc_owner_token');
+  if(!token){
+    alert("الزر مخفي لهذا المتصفح. لتفعيله شغّل الأمر المناسب في Console (شرح داخل الكود).");
+    return;
+  }
   if(!promptPassword()){
     alert("كلمة المرور خطأ.");
     return;
