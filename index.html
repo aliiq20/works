@@ -544,8 +544,7 @@ lightbox.addEventListener("click", (e)=> { if(e.target === lightbox) lightbox.cl
 
 // ====== ADMIN UI ======
 function promptPassword(){
-  const p = prompt(" هااا تريد تدخل 😂
-متكدر لاتحاول:");
+  const p = prompt("ادخل كلمة المرور للوصول للوحة التحكم:");
   if(p === null) return false;
   return p === ADMIN_PASSWORD;
 }
