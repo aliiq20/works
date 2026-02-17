@@ -3,99 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>علي الشمري | Ali Alshammari</title>
+    <title>علي الشمري | ALI ALSHAMMARI</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --bg: #0a0a0a; --card: #151515; }
-        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; }
-        
-        /* البانر العلوي المتحرك */
-        .top-ticker { background: rgba(212, 175, 55, 0.1); border-bottom: 1px solid var(--gold); padding: 8px 0; overflow: hidden; }
-        .ticker-content { display: flex; white-space: nowrap; animation: move 20s linear infinite; }
-        .ticker-content span { margin: 0 30px; color: var(--gold); font-weight: bold; font-size: 0.9rem; }
-        @keyframes move { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        :root { --gold: #D4AF37; --black: #080808; }
+        body { background: var(--black); color: white; font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* الهيدر واللوجو */
-        header { padding: 40px 20px; text-align: center; }
-        .main-logo { width: 150px; filter: drop-shadow(0 0 10px var(--gold)); }
-        header h1 { color: var(--gold); margin-top: 15px; font-size: 2.2rem; letter-spacing: 2px; }
-
-        /* شبكة المجلدات - نفس ستايل Codeekey */
-        .folder-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px 8%; }
-        .folder-card { 
-            background: var(--card); border: 1px solid #222; border-radius: 15px; padding: 30px; 
-            text-align: center; transition: 0.3s; cursor: pointer; position: relative;
+        /* Cinematic Hero Section */
+        .hero {
+            position: relative; height: 100vh; width: 100%;
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
-        .folder-card:hover { border-color: var(--gold); transform: scale(1.02); box-shadow: 0 0 20px rgba(212,175,55,0.1); }
-        .folder-card i { font-size: 40px; color: var(--gold); margin-bottom: 15px; }
+        .hero video {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            min-width: 100%; min-height: 100%; object-fit: cover; z-index: -1; opacity: 0.5;
+        }
+        .hero-content { text-align: center; z-index: 1; }
+        .hero-content h1 { 
+            font-size: clamp(3rem, 10vw, 8rem); margin: 0; font-weight: 900; 
+            line-height: 0.8; letter-spacing: -2px; color: transparent;
+            -webkit-text-stroke: 1px var(--gold);
+        }
+        .hero-content h1 span { color: var(--gold); display: block; -webkit-text-stroke: 0; }
 
-        /* مشغل الفيديو المدمج */
-        .video-popup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; }
-        .video-content { width: 90%; max-width: 800px; aspect-ratio: 16/9; position: relative; }
-        .close-btn { position: absolute; top: -50px; right: 0; color: white; font-size: 30px; cursor: pointer; }
+        /* Floating Nav */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 30px 5%;
+            display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        .logo { width: 60px; filter: drop-shadow(0 0 10px var(--gold)); }
 
-        .social-fixed { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; background: rgba(0,0,0,0.8); padding: 12px 25px; border-radius: 50px; border: 1px solid var(--gold); }
-        .social-fixed a { color: white; font-size: 20px; }
+        /* Modern Category Grid */
+        .section-label { padding: 100px 5% 20px; color: var(--gold); font-size: 14px; letter-spacing: 5px; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 10px; }
+        .grid-item { 
+            height: 60vh; background: #111; position: relative; overflow: hidden; 
+            display: flex; align-items: flex-end; padding: 30px;
+        }
+        .grid-item img, .grid-item video { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            object-fit: cover; transition: 1s; opacity: 0.6; z-index: 0;
+        }
+        .grid-item:hover img { transform: scale(1.1); opacity: 0.3; }
+        .grid-item h2 { position: relative; z-index: 1; font-size: 2rem; margin: 0; }
+        .grid-item span { color: var(--gold); font-size: 12px; display: block; }
+
+        /* Contact Bar */
+        .footer-social { padding: 100px 5%; text-align: center; background: #000; }
+        .social-links a { color: white; font-size: 30px; margin: 0 20px; transition: 0.4s; }
+        .social-links a:hover { color: var(--gold); }
+
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="top-ticker">
-        <div class="ticker-content">
-            <span>CINEMATIC 4K VIDEO</span><span>S-LOG3 COLOR GRADING</span><span>DJI RS4 STABILIZATION</span><span>SONY A7III PHOTOGRAPHY</span>
+
+    <nav>
+        <img src="https://i.imgur.com/x4.x5_logo.png" alt="Ali Alshammari" class="logo">
+        <a href="tel:07735023094" style="color: white; text-decoration: none; border: 1px solid var(--gold); padding: 10px 20px; border-radius: 50px; font-size: 12px;">احجز موعداً</a>
+    </nav>
+
+    <section class="hero">
+        <video autoplay muted loop playsinline>
+            <source src="https://storage.googleapis.com/shmri26.firebasestorage.app/videos/food/1000028027.mp4" type="video/mp4">
+        </video>
+        <div class="hero-content" data-aos="zoom-in">
+            <h1 style="color: white; -webkit-text-stroke: 0;">علي <span>الشمري</span></h1>
+            <p style="color: var(--gold); letter-spacing: 10px; margin-top: 20px;">CINEMATOGRAPHER</p>
+        </div>
+    </section>
+
+    <div class="section-label">الأقسام الإبداعية</div>
+
+    <div class="grid">
+        <div class="grid-item" data-aos="fade-up">
+            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80">
+            <div>
+                <span>AUTOMOTIVE</span>
+                <h2>السيارات والعقارات</h2>
+            </div>
+        </div>
+        <div class="grid-item" data-aos="fade-up" data-aos-delay="200">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80">
+            <div>
+                <span>COMMERCIAL</span>
+                <h2>المطاعم والشركات</h2>
+            </div>
         </div>
     </div>
 
-    <header>
-        <img src="https://i.ibb.co/XfXkY0p/1000031733.jpg" class="main-logo" alt="Logo"> <h1>علي الشمري</h1>
-        <p style="color: #666;">خبير تصوير سينمائي وفوتوغرافي</p>
-    </header>
-
-    <div class="folder-container">
-        <div class="folder-card" onclick="openGallery('cars')">
-            <i class="fas fa-car"></i>
-            <h3>السيارات والعقارات</h3>
+    <footer class="footer-social">
+        <h3 style="color: var(--gold); margin-bottom: 50px;">لنخلق شيئاً عظيماً معاً</h3>
+        <div class="social-links">
+            <a href="https://instagram.com/x4.x5"><i class="fab fa-instagram"></i></a>
+            <a href="https://tiktok.com/@sh.di"><i class="fab fa-tiktok"></i></a>
+            <a href="https://wa.me/9647735023094"><i class="fab fa-whatsapp"></i></a>
         </div>
-        <div class="folder-card" onclick="openGallery('food')">
-            <i class="fas fa-utensils"></i>
-            <h3>المطاعم والشركات</h3>
-        </div>
-        <div class="folder-card" onclick="openGallery('weddings')">
-            <i class="fas fa-heart"></i>
-            <h3>الأعراس والمناسبات</h3>
-        </div>
-    </div>
+        <p style="margin-top: 50px; color: #444; font-size: 12px;">© 2026 ALI ALSHAMMARI PHOTOGRAPHY</p>
+    </footer>
 
-    <div id="videoPopup" class="video-popup">
-        <div class="video-content">
-            <span class="close-btn" onclick="closeGallery()">&times;</span>
-            <iframe id="videoIframe" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
-        </div>
-    </div>
-
-<div class="social-fixed">
-        <a href="https://instagram.com/x4.x5"><i class="fab fa-instagram"></i></a>
-        <a href="https://t.me/shmrye"><i class="fab fa-telegram"></i></a>
-        <a href="https://tiktok.com/@sh.di"><i class="fab fa-tiktok"></i></a>
-        <a href="https://wa.me/9647735023094"><i class="fab fa-whatsapp"></i></a>
-    </div>
-
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // هنا نبرمج فتح فيديوهات اليوتيوب مالتك
-        function openGallery(cat) {
-            const popup = document.getElementById('videoPopup');
-            const iframe = document.getElementById('videoIframe');
-            
-            // سيتم سحب الروابط من لوحة التحكم لاحقاً، حالياً نضع تجريبي
-            let videoID = "dQw4w9WgXcQ"; // مثال
-            iframe.src = https://www.youtube.com/embed/${videoID}?rel=0&modestbranding=1;
-            popup.style.display = 'flex';
-        }
-
-        function closeGallery() {
-            document.getElementById('videoPopup').style.display = 'none';
-            document.getElementById('videoIframe').src = "";
-        }
+        AOS.init({ duration: 1000, once: true });
     </script>
 </body>
 </html>
