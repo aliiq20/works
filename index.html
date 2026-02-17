@@ -3,73 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المصور علي الشمري | الاحترافية في كل لقطة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>ALI ALSHAMMARI | المصور علي الشمري</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Cairo:wght@300;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --bg: #050505; }
-        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
+        :root { --gold: #D4AF37; --black: #000000; --dark-grey: #0a0a0a; }
+        * { box-sizing: border-box; }
+        body { background: var(--black); color: white; font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
+
+        /* Cinematic Loader */
+        .reveal-text { font-family: 'Syne', sans-serif; font-size: 15vw; line-height: 0.8; text-transform: uppercase; font-weight: 800; }
+
+        /* Navbar Minimalist */
+        nav { position: fixed; top: 0; width: 100%; padding: 40px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; mix-blend-mode: difference; }
+        .logo-text { font-family: 'Syne'; font-size: 24px; color: var(--gold); text-decoration: none; letter-spacing: 2px; }
+
+        /* Hero Section 100% Radical */
+        .hero { height: 100vh; display: flex; align-items: center; padding: 0 5%; position: relative; }
+        .hero-title { z-index: 2; position: relative; }
+        .hero-title h1 { margin: 0; font-size: clamp(4rem, 12vw, 15rem); font-family: 'Syne'; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.3); line-height: 0.9; }
+        .hero-title h1 span { color: white; display: block; }
         
-        /* تأثير عدسة الكاميرا يلحق الماوس */
-        .lens-flare {
-            position: fixed; pointer-events: none; width: 150px; height: 150px;
-            background: radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%);
-            transform: translate(-50%, -50%); z-index: 9999;
-        }
+        /* Background Highlight */
+        .bg-glow { position: absolute; top: 50%; left: 50%; width: 40vw; height: 40vw; background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%); transform: translate(-50%, -50%); pointer-events: none; }
 
-        /* البانر المتحرك */
-        .ticker-wrap { width: 100%; overflow: hidden; background: rgba(212, 175, 55, 0.05); border-bottom: 1px solid var(--gold); padding: 10px 0; }
-        .ticker { display: flex; white-space: nowrap; animation: marquee 25s linear infinite; }
-        .ticker span { color: var(--gold); font-weight: bold; margin: 0 40px; font-size: 1rem; }
-        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        /* Work Section (Masonry Style) */
+        .work-label { padding: 150px 5% 50px; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: flex-end; }
+        .work-label h2 { font-size: 80px; font-family: 'Syne'; margin: 0; }
 
-        .hero { height: 60vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .hero h1 { font-size: 3.5rem; color: var(--gold); margin: 0; text-shadow: 0 0 15px rgba(212,175,55,0.5); }
+        .portfolio-container { padding: 0 5%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 100px; margin-top: 50px; }
+        .video-item { position: relative; width: 100%; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .video-item:nth-child(even) { margin-top: 150px; } /* اختلاف الارتفاع لإعطاء فخامة */
         
-        .folders { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; padding: 40px 10%; }
-        .folder-card { 
-            background: #111; border: 1px solid #222; border-radius: 20px; padding: 40px; 
-            text-align: center; transition: 0.4s; cursor: pointer; position: relative; 
-        }
-        .folder-card:hover { border-color: var(--gold); transform: translateY(-10px); box-shadow: 0 0 25px rgba(212,175,55,0.15); }
-        .folder-card i { font-size: 50px; color: var(--gold); margin-bottom: 15px; }
+        .video-wrapper { position: relative; width: 100%; padding-top: 125%; overflow: hidden; background: #0a0a0a; border-radius: 4px; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; filter: grayscale(1); transition: 0.8s; scale: 1.1; }
+        .video-item:hover iframe { filter: grayscale(0); scale: 1.0; }
 
-        .social-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; background: rgba(20,20,20,0.8); padding: 15px 30px; border-radius: 50px; backdrop-filter: blur(10px); border: 1px solid var(--gold); }
-        .social-bar a { color: white; font-size: 22px; transition: 0.3s; }
-        .social-bar a:hover { color: var(--gold); transform: scale(1.2); }
+        .video-info { margin-top: 20px; }
+        .video-info span { color: var(--gold); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; }
+        .video-info h3 { font-size: 24px; margin: 5px 0; font-weight: 300; }
+
+        /* Modern Footer */
+        footer { padding: 150px 5%; background: var(--dark-grey); text-align: center; }
+        .footer-cta { font-family: 'Syne'; font-size: 8vw; color: white; text-decoration: none; transition: 0.3s; }
+        .footer-cta:hover { color: var(--gold); -webkit-text-stroke: 1px white; color: transparent; }
+
+        @media (max-width: 768px) {
+            .portfolio-container { grid-template-columns: 1fr; gap: 50px; }
+            .video-item:nth-child(even) { margin-top: 0; }
+            .hero-title h1 { font-size: 20vw; }
+        }
     </style>
 </head>
 <body>
-    <div class="lens-flare" id="flare"></div>
-    <div class="ticker-wrap">
-        <div class="ticker">
-            <span>4K CINEMATOGRAPHY</span><span>WEDDING FILMS</span><span>COMMERCIAL ADS</span><span>DJI RS4 STABILIZED</span><span>S-LOG3 COLORING</span>
-        </div>
-    </div>
+
+    <nav>
+        <a href="#" class="logo-text">ALSHAMMARI</a>
+        <div class="contact-trigger"><i class="fas fa-bars"></i></div>
+    </nav>
 
     <section class="hero">
-        <h1>علي الشمري</h1>
-        <p style="letter-spacing: 5px; color: #888;">PHOTOGRAPHY & VIDEOGRAPHY</p>
+        <div class="bg-glow"></div>
+        <div class="hero-title" data-aos="fade-right">
+            <h1>ALI<span>SHAMMARI</span></h1>
+            <p style="color: var(--gold); letter-spacing: 15px; margin-top: 30px;">CINEMATOGRAPHER & ARTIST</p>
+        </div>
     </section>
 
-    <div class="folders">
-        <div class="folder-card"><i class="fas fa-car"></i><h3>السيارات والعقارات</h3></div>
-        <div class="folder-card"><i class="fas fa-utensils"></i><h3>المطاعم والشركات</h3></div>
-        <div class="folder-card"><i class="fas fa-heart"></i><h3>الأعراس والمناسبات</h3></div>
+    <div class="work-label">
+        <h2 data-aos="fade-up">SELECTED<br>WORKS</h2>
+        <p style="color: #666; max-width: 300px;">توثيق اللحظات بأحدث التقنيات السينمائية واستخدام معدات Sony a7 III و DJI RS4.</p>
     </div>
 
-    <div class="social-bar">
-        <a href="https://instagram.com/x4.x5"><i class="fab fa-instagram"></i></a>
-        <a href="https://t.me/shmrye"><i class="fab fa-telegram"></i></a>
-        <a href="https://tiktok.com/@sh.di"><i class="fab fa-tiktok"></i></a>
-        <a href="https://wa.me/9647735023094"><i class="fab fa-whatsapp"></i></a>
-    </div>
+    <div class="portfolio-container" id="yt-grid">
+        </div>
 
+    <footer>
+        <p style="color: var(--gold); margin-bottom: 20px;">هل أنت مستعد لمشروعك القادم؟</p>
+        <a href="https://wa.me/9647735023094" class="footer-cta">GET IN TOUCH</a>
+        <div style="margin-top: 100px; display: flex; justify-content: center; gap: 30px;">
+            <a href="https://instagram.com/x4.x5" style="color: white;"><i class="fab fa-instagram"></i></a>
+            <a href="https://tiktok.com/@sh.di" style="color: white;"><i class="fab fa-tiktok"></i></a>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
     <script>
-        const flare = document.getElementById('flare');
-        document.addEventListener('mousemove', (e) => {
-            flare.style.left = e.clientX + 'px';
-            flare.style.top = e.clientY + 'px';
+        AOS.init();
+        
+        // ربط Firebase الخاص بك
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVLTKpaHzLLY0t5xzG5ArzllpqcnCVVAk",
+            authDomain: "shmri26.firebaseapp.com",
+            projectId: "shmri26",
+            storageBucket: "shmri26.firebasestorage.app",
+            messagingSenderId: "995693247986",
+            appId: "1:995693247986:web:0c8711c43de9a94cf5bf6b"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // سحب الفيديوهات وعرضها بنمط CodeeKey
+        db.collection("portfolio").orderBy("date", "desc").onSnapshot((snapshot) => {
+            const grid = document.getElementById('yt-grid');
+            grid.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const videoId = data.url.split('v=')[1] || data.url.split('/').pop();
+                grid.innerHTML += `
+                    <div class="video-item" data-aos="fade-up">
+                        <div class="video-wrapper">
+                            <iframe src="https://www.youtube.com/embed/${videoId}?modestbranding=1&rel=0&controls=0" allowfullscreen></iframe>
+                        </div>
+                        <div class="video-info">
+                            <span>${data.category}</span>
+                            <h3>مشروع سينمائي احترافي</h3>
+                        </div>
+                    </div>
+                `;
+            });
         });
     </script>
 </body>
