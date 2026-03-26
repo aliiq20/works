@@ -1,124 +1,859 @@
-<!DOCTYPE html><html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>المصور علي الشمري</title>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>  <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      background: black;
-      color: white;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>المصور علي الشمري</title>
+<meta name="description" content="الصفحة الشخصية للمصور علي الشمري" />
+<style>
+:root {
+  --bg:#000;
+  --accent:#ffa500; /* افتراضي برتقالي */
+  --accent-hover:#ff8c00;
+  --text:#fff;
+}
 
-    header {
-      text-align: center;
-      padding: 20px;
-      font-size: 28px;
-      font-weight: bold;
-      background: linear-gradient(90deg, red, blue, green, purple);
-      animation: rgbMove 5s infinite linear;
-      background-size: 400%;
-    }
+/* أنيميشن تدرج متموج */
+@keyframes rgbWave {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
 
-    @keyframes rgbMove {
-      0% {background-position: 0%}
-      100% {background-position: 400%}
-    }
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+html, body {
+  height:100%;
+  font-family:system-ui,Segoe UI,Roboto,"Noto Naskh Arabic UI",Tahoma,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+#snow, .stars {
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+.stars {
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.7) 50%, transparent 51%),
+    radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 40% 60%, rgba(255,255,255,.6) 50%, transparent 51%),
+    radial-gradient(1px 1px at 85% 25%, rgba(255,255,255,.6) 50%, transparent 51%),
+    radial-gradient(1px 1px at 10% 75%, rgba(255,255,255,.4) 50%, transparent 51%);
+  opacity:.7;
+}
+.wrap {
+  position:relative;
+  z-index:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  min-height:100%;
+  padding:23px 11px;
+  gap:11px;
+  transform-origin: top center;
+  transition: transform 0.3s ease;
+}
+.avatar {
+  width:40%;
+  max-width:172px;
+  aspect-ratio:1/1;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--accent);
+  box-shadow:0 0 25px var(--accent),0 0 4px rgba(255,255,255,.9) inset;
+  transition:all .3s ease;
+}
+h1 {
+  margin:4px 0 0;
+  font-size:clamp(18px,3.45vw,25px);
+  font-weight:800;
+  letter-spacing:.3px;
+  text-shadow:0 0 6px rgba(255,255,255,.15);
+  text-align:center;
+}
+.btn {
+  display:block;
+  width:93%;
+  max-width:460px;
+  background:var(--accent);
+  color:#000;
+  text-decoration:none;
+  font-weight:700;
+  padding:11px 17px;
+  margin:5px 0;
+  border-radius:50px;
+  text-align:center;
+  font-size:clamp(13px,2.875vw,20px);
+  transition:all .2s;
+  box-shadow:0 0 12px var(--accent),0 0 3px rgba(255,255,255,.7) inset;
+}
+.btn:hover {
+  background:var(--accent-hover);
+  box-shadow:0 0 18px var(--accent-hover);
+  transform:translateY(-1px);
+}
+.btn:active {
+  transform:translateY(0);
+}
+.credit {
+  opacity:.8;
+  font-size:12px;
+  margin-top:6px;
+}
+.spacer {
+  height:23px;
+}
+/* زر الإعدادات */
+#settingsBtn {
+position:absolute;
+top:15px;
+left:15px;
+background:#444;
+color:#fff;
+border:none;
+padding:6px 10px;
+border-radius:8px;
+cursor:pointer;
+z-index:10;
+transition:background 0.2s;
+}
+#settingsBtn.active {
+background:#666;
+}
+/* قائمة الإعدادات */
+#settingsMenu {
+position:absolute;
+top:50px;
+left:15px;
+background:#222;
+padding:10px;
+border-radius:8px;
+display:none;
+z-index:10;
+width:180px;
+opacity:0;
+transform:translateY(-10px);
+transition:opacity 0.25s ease, transform 0.25s ease;
+}
+#settingsMenu.show {
+display:block;
+opacity:1;
+transform:translateY(0);
+}
+#settingsMenu label {
+display:block;
+margin-bottom:8px;
+color:#fff;
+font-size:14px;
+}
+#settingsMenu input {
+width:100%;
+}
+.color-option {
+display:inline-block;
+width:22px;
+height:22px;
+border-radius:50%;
+margin:2px;
+cursor:pointer;
+border:1px solid #fff;
+}
+.range-container {
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+#scaleValue {
+  min-width: 40px;
+  text-align:center;
+  font-size:13px;
+  color:#fff;
+  background:#333;
+  border-radius:4px;
+  padding:2px 4px;
+}
 
-    .videos {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
+/* --- GALLERY / ADMIN STYLES --- */
+.gallery {
+  width:100%;
+  max-width:980px;
+  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  z-index:2;
+}
+.cat-header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  background:rgba(255,255,255,0.03);
+  padding:8px 12px;
+  border-radius:10px;
+}
+.cat-title { font-weight:800; }
+.cat-actions { display:flex; gap:6px; align-items:center; }
+.media-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap:10px;
+  padding:10px;
+}
+.media-card {
+  background:rgba(255,255,255,0.02);
+  border-radius:8px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  align-items:stretch;
+  padding:6px;
+}
+.media-thumb {
+  width:100%;
+  height:110px;
+  object-fit:cover;
+  border-radius:6px;
+  background:#111;
+}
+.media-info {
+  padding:4px;
+  font-size:13px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+}
+.small { font-size:12px; opacity:0.85; }
 
-    .card {
-      background: #111;
-      padding: 10px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px rgba(255,0,255,0.5);
-    }
+/* Admin button top-right */
+#adminBtn {
+  position:absolute;
+  top:15px;
+  right:15px;
+  background:#222;
+  color:#fff;
+  border:none;
+  padding:6px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  z-index:10;
+}
 
-    iframe {
-      width: 100%;
-      height: 200px;
-      border-radius: 10px;
-    }
+/* Admin modal */
+.admin-modal {
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  background:linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8));
+}
+.admin-modal.show { display:flex; }
+.admin-panel {
+  width:calc(100% - 40px);
+  max-width:900px;
+  background:#0f0f0f;
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 6px 30px rgba(0,0,0,0.6);
+  color:var(--text);
+  direction:rtl;
+}
+.row { display:flex; gap:8px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+.input, input[type="text"], select, textarea {
+  background:#111;
+  color:#fff;
+  border:1px solid #222;
+  padding:8px;
+  border-radius:8px;
+  font-size:14px;
+}
+input[type="file"] { color: #fff; }
+.btn-admin {
+  background:var(--accent);
+  color:#000;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+}
+.small-muted { font-size:12px; opacity:0.75; }
+.action-danger { background:#8b0000; color:#fff; padding:6px 8px; border-radius:6px; cursor:pointer; }
 
-    button {
-      padding: 10px;
-      margin-top: 10px;
-      width: 100%;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(90deg, red, blue);
-      color: white;
-      cursor: pointer;
-    }
+/* media viewer (lightbox) */
+.lightbox {
+  position:fixed;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9998;
+  background:rgba(0,0,0,0.85);
+  padding:20px;
+}
+.lightbox.show { display:flex; }
+.lightbox-media {
+  max-width:95%;
+  max-height:85%;
+}
+.lightbox-close {
+  position:absolute;
+  top:18px;
+  left:18px;
+  background:#222;
+  color:#fff;
+  border:none;
+  padding:6px 10px;
+  border-radius:6px;
+  cursor:pointer;
+  z-index:9999;
+}
 
-    .admin {
-      padding: 20px;
-      background: #222;
-      margin: 20px;
-      border-radius: 15px;
-    }
+/* responsive tweaks */
+@media (max-width:600px){
+  .media-thumb { height:90px; }
+  .admin-panel { padding:10px; }
+}
+</style>
+</head>
+<body>
+<div class="stars" aria-hidden="true"></div>
+<canvas id="snow" aria-hidden="true"></canvas>
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 10px;
-      border: none;
-    }
-  </style></head>
-<body><header>
-  المصور علي الشمري 🎥
-</header><div style="text-align:center; margin-top:20px;">
-  <button onclick="login()">تسجيل دخول گوگل</button>
-</div><div class="admin">
-  <h3>لوحة التحكم</h3>
-  <input type="text" id="videoUrl" placeholder="رابط الفيديو (YouTube Embed)">
-  <button onclick="addVideo()">إضافة فيديو</button>
-</div><div class="videos" id="videos"></div><script>
-  const firebaseConfig = {
-    apiKey: "YOUR_KEY",
-    authDomain: "YOUR_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-  };
+<!-- زر الإعدادات -->
+<button id="settingsBtn">⚙️</button>
+<button id="adminBtn">🔒 لوحة التحكم</button>
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+<!-- قائمة الإعدادات -->
+<div id="settingsMenu">
+  <label>اختر اللون:</label>
+  <div>
+    <span class="color-option" data-color="#ffa500" style="background:#ffa500;" title="برتقالي"></span>
+    <span class="color-option" data-color="#800080" style="background:#800080;" title="بنفسجي"></span>
+    <span class="color-option" data-color="#8B4513" style="background:#8B4513;" title="جوزي"></span>
+    <span class="color-option" data-color="#C2B280" style="background:#C2B280;" title="صحراوي"></span>
+    <span class="color-option" data-color="#808080" style="background:#808080;" title="رمادي"></span>
+    <span class="color-option" data-color="rgb" style="background:linear-gradient(90deg, red, orange, yellow, green, blue, purple);" title="RGB"></span>
+    <input type="color" id="colorPicker" value="#ffa500">
+  </div>
+  <label>حجم الصفحة:</label>
+  <div class="range-container">
+    <input type="range" id="scaleInput" min="50" max="600" value="100">
+    <div id="scaleValue">100%</div>
+  </div>
+</div>
 
-  function login() {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    auth.signInWithPopup(provider);
+<main class="wrap">
+  <img class="avatar" src="myphoto.jpg" alt="صورة شخصية" />
+  <h1>المصور علي الشمري 📸</h1>
+  <a class="btn" href="https://t.me/AliPhoto25" target="_blank" rel="noopener">جميع اعمالي 🎯 📂</a>
+  <a class="btn" href="https://www.instagram.com/1cc_c?igsh=MWR6dnU1YWxudmp4Zg==" target="_blank" rel="noopener">حساب التصوير📸</a>
+  <a class="btn" href="https://www.tiktok.com/@sh.di" target="_blank" rel="noopener">حسابي التيك توك 🎵</a>
+  <a class="btn" href="https://www.youtube.com/@shmri25" target="_blank" rel="noopener">قناتي اليوتيوب ▶️</a>
+  <a class="btn" href="https://www.facebook.com/share/1FHHbLJT6i/" target="_blank" rel="noopener">حسابي الفيس بوك 📘</a>
+  <a class="btn" href="https://www.facebook.com/share/16p6V6pzLw/" target="_blank" rel="noopener">صفحتي على الفيس بوك 🌐</a>
+
+  <button class="btn" onclick="togglePlay()">علي اميري</button>
+  <audio id="player" src="علي أميري ونعم الأمير _ أجمل أنشودة(MP3_160K).mp3"></audio>
+
+  <!-- معرض (سيتم ملؤه ديناميكياً من localStorage) -->
+  <section class="gallery" id="gallery"></section>
+
+  <div class="credit">© جميع الحقوق محفوظة لدى المصور علي الشمري</div>
+  <div class="spacer"></div>
+</main>
+
+<!-- Admin modal -->
+<div class="admin-modal" id="adminModal" aria-hidden="true">
+  <div class="admin-panel" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h2 id="adminTitle">لوحة تحكّم - رفع الصور والفيديو</h2>
+      <button id="closeAdmin" class="action-danger">خروج</button>
+    </div>
+
+    <div class="row">
+      <label class="small-muted">كلمة المرور: (محمية بالمتصفح فقط)</label>
+      <div class="small-muted">تغيير كلمة المرور داخل الكود المتغير <code>ADMIN_PASSWORD</code></div>
+    </div>
+
+    <div style="border-top:1px solid rgba(255,255,255,0.04);padding-top:10px;margin-top:8px;">
+      <div class="row">
+        <select id="categorySelect" class="input"></select>
+        <input id="newCategoryName" class="input" placeholder="اسم مجلد جديد (اختياري لإنشاء)" />
+        <button id="createCategoryBtn" class="btn-admin">إنشاء مجلد</button>
+      </div>
+
+      <div class="row">
+        <input type="file" id="fileInput" multiple accept="image/*,video/*" />
+        <input id="fileTitle" class="input" placeholder="عنوان عام للملف/الملفات أو اترك فارغ" />
+        <button id="uploadBtn" class="btn-admin">رفع</button>
+      </div>
+
+      <div class="row small-muted">
+        ملاحظة: حفظ الملفات يتم داخل متصفحك (localStorage). لا تقم برفع فيديوهات ضخمة هنا. إن أردت رفع ملفات كبيرة استخدم خدمة تخزين واحتفظ بالروابط.
+      </div>
+
+      <div style="margin-top:10px;">
+        <h3 class="small-muted">إدارة المجلدات والمحتوى</h3>
+        <div id="adminContent"></div>
+      </div>
+
+      <div style="margin-top:10px;border-top:1px solid rgba(255,255,255,0.04);padding-top:10px;">
+        <button id="exportBtn" class="btn-admin">تصدير البيانات (JSON)</button>
+        <button id="importBtn" class="btn-admin">استيراد بيانات (JSON)</button>
+        <input type="file" id="importFile" accept=".json" style="display:none;" />
+        <button id="clearAllBtn" class="action-danger">مسح كل البيانات (حذف نهائي)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" aria-hidden="true">
+  <button class="lightbox-close" id="lightboxClose">✖</button>
+  <div id="lightboxContent"></div>
+</div>
+
+<script>
+/* ===========================
+   ADMIN / GALLERY LOGIC
+   ===========================
+   - تخزين المحتوى في localStorage تحت المفتاح "vc_gallery_data"
+   - هيكل البيانات:
+   {
+     categories: {
+       "مجلد 1": { items: [ {id, type:"image"|"video", title, data, date} , ... ] },
+       ...
+     }
+   }
+   - ملاحظة: تخزين الفيديو كـ dataURL قد يصل للحدود بسرعة.
+*/
+
+// ====== CONFIG ======
+const STORAGE_KEY = "vc_gallery_data";
+const ADMIN_PASSWORD = "a.m.m2001"; // <-- غيّرها إذا تريد. الحماية هنا بسيطة (بالمتصفح فقط).
+
+// ====== DOM ======
+const galleryEl = document.getElementById("gallery");
+const adminBtn = document.getElementById("adminBtn");
+const adminModal = document.getElementById("adminModal");
+const closeAdmin = document.getElementById("closeAdmin");
+const fileInput = document.getElementById("fileInput");
+const uploadBtn = document.getElementById("uploadBtn");
+const fileTitle = document.getElementById("fileTitle");
+const categorySelect = document.getElementById("categorySelect");
+const createCategoryBtn = document.getElementById("createCategoryBtn");
+const newCategoryName = document.getElementById("newCategoryName");
+const adminContent = document.getElementById("adminContent");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const importFile = document.getElementById("importFile");
+const clearAllBtn = document.getElementById("clearAllBtn");
+
+const lightbox = document.getElementById("lightbox");
+const lightboxContent = document.getElementById("lightboxContent");
+const lightboxClose = document.getElementById("lightboxClose");
+
+// ====== helpers ======
+function uid() { return 'id-' + Math.random().toString(36).slice(2,10); }
+function nowISO(){ return new Date().toISOString(); }
+
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){ return {categories:{}}; }
+    return JSON.parse(raw);
+  }catch(e){
+    console.error("failed load data", e);
+    return {categories:{}};
   }
-
-  function addVideo() {
-    const url = document.getElementById('videoUrl').value;
-    db.collection('videos').add({ url });
+}
+function saveData(data){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }catch(e){
+    alert("فشل حفظ البيانات. ممكن تجاوز حجم التخزين في المتصفح. حاول ملفات أصغر أو استخدم حل استضافة للملفات.");
+    console.error(e);
   }
+}
 
-  function loadVideos() {
-    db.collection('videos').onSnapshot(snapshot => {
-      const container = document.getElementById('videos');
-      container.innerHTML = '';
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        container.innerHTML += `
-          <div class="card">
-            <iframe src="${data.url}" allowfullscreen></iframe>
-            <button onclick="like()">❤️ لايك</button>
-          </div>
-        `;
+// ====== render gallery for visitors ======
+function renderGallery(){
+  const data = loadData();
+  galleryEl.innerHTML = "";
+  const cats = Object.keys(data.categories || {});
+  if(cats.length === 0){
+    galleryEl.innerHTML = '<div class="small-muted" style="padding:12px;text-align:center;"></div>';
+    return;
+  }
+  for(const cat of cats){
+    const section = document.createElement("section");
+    const header = document.createElement("div"); header.className="cat-header";
+    const title = document.createElement("div"); title.className="cat-title"; title.textContent = cat;
+    header.appendChild(title);
+    section.appendChild(header);
+
+    const grid = document.createElement("div"); grid.className="media-grid";
+    const items = data.categories[cat].items || [];
+    items.forEach(item=>{
+      const card = document.createElement("div"); card.className="media-card";
+      if(item.type === "image"){
+        const img = document.createElement("img"); img.className="media-thumb"; img.src = item.data; img.alt = item.title || "";
+        img.addEventListener("click", ()=>openLightbox(item));
+        card.appendChild(img);
+      } else if(item.type === "video"){
+        const v = document.createElement("video"); v.className="media-thumb"; v.src = item.data; v.controls = true;
+        v.addEventListener("click", ()=>openLightbox(item));
+        card.appendChild(v);
+      }
+      const info = document.createElement("div"); info.className="media-info";
+      const t = document.createElement("div"); t.textContent = item.title || "بدون عنوان"; t.className="";
+      const d = document.createElement("div"); d.className="small"; d.textContent = (new Date(item.date)).toLocaleDateString('ar-EG');
+      info.appendChild(t); info.appendChild(d);
+      card.appendChild(info);
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    galleryEl.appendChild(section);
+  }
+}
+
+// ====== lightbox ======
+function openLightbox(item){
+  lightboxContent.innerHTML = "";
+  if(item.type === "image"){
+    const img = document.createElement("img"); img.className="lightbox-media"; img.src = item.data; img.alt = item.title || "";
+    lightboxContent.appendChild(img);
+  } else {
+    const v = document.createElement("video"); v.className="lightbox-media"; v.src = item.data; v.controls=true; v.autoplay=true;
+    lightboxContent.appendChild(v);
+  }
+  lightbox.classList.add("show");
+}
+lightboxClose.addEventListener("click", ()=> lightbox.classList.remove("show"));
+lightbox.addEventListener("click", (e)=> { if(e.target === lightbox) lightbox.classList.remove("show"); });
+
+// ====== ADMIN UI ======
+function promptPassword(){
+  const p = prompt("ادخل كلمة المرور للوصول للوحة التحكم:");
+  if(p === null) return false;
+  return p === ADMIN_PASSWORD;
+}
+adminBtn.addEventListener("click", async ()=>{
+  if(!promptPassword()){
+    alert("كلمة المرور خطأ.");
+    return;
+  }
+  openAdmin();
+});
+
+closeAdmin.addEventListener("click", ()=> adminModal.classList.remove("show"));
+
+function openAdmin(){
+  adminModal.classList.add("show");
+  populateCategorySelect();
+  renderAdminContent();
+}
+
+function populateCategorySelect(){
+  const data = loadData();
+  categorySelect.innerHTML = "";
+  const cats = Object.keys(data.categories || {});
+  const optNone = document.createElement("option"); optNone.value=""; optNone.textContent="-- اختر مجلد --";
+  categorySelect.appendChild(optNone);
+  cats.forEach(c=>{
+    const o = document.createElement("option"); o.value = c; o.textContent = c;
+    categorySelect.appendChild(o);
+  });
+}
+
+createCategoryBtn.addEventListener("click", ()=>{
+  const name = newCategoryName.value.trim();
+  if(!name){ alert("ادخل اسم مجلد صحيح."); return; }
+  const data = loadData();
+  if(data.categories[name]){ alert("هالمجلد موجود مسبقًا."); return; }
+  data.categories[name] = { items: [] };
+  saveData(data);
+  newCategoryName.value = "";
+  populateCategorySelect();
+  renderAdminContent();
+});
+
+uploadBtn.addEventListener("click", async ()=>{
+  const files = fileInput.files;
+  if(!files || files.length===0){ alert("اختر ملفاً واحداً على الأقل للرفع."); return; }
+
+  const targetCat = categorySelect.value.trim();
+  const newCatName = newCategoryName.value.trim();
+  let catName = targetCat || newCatName;
+  if(!catName){
+    alert("اختر مجلدًا أو اكتب اسم مجلد جديد لإنشاءه."); return;
+  }
+  const data = loadData();
+  if(!data.categories[catName]) data.categories[catName] = { items: [] };
+
+  const titleCommon = fileTitle.value.trim();
+
+  // read each file as dataURL
+  for(const f of files){
+    // warn if file too big (>5MB)
+    if(f.size > 6 * 1024 * 1024){
+      const ok = confirm(`الملف "${f.name}" حجمه كبير (${Math.round(f.size/1024/1024)}MB). التخزين في المتصفح قد يفشل. تابع؟`);
+      if(!ok) continue;
+    }
+    const dataURL = await readFileAsDataURL(f);
+    const type = f.type.startsWith("video") ? "video" : "image";
+    const item = { id: uid(), type, title: titleCommon || f.name, data: dataURL, date: nowISO() };
+    data.categories[catName].items.unshift(item); // أضف في البداية
+  }
+  saveData(data);
+  fileInput.value = "";
+  fileTitle.value = "";
+  newCategoryName.value = "";
+  populateCategorySelect();
+  renderAdminContent();
+  renderGallery();
+  alert("تم الرفع بنجاح (إذا لم تظهر الملفات ربما السبب حد التخزين في المتصفح).");
+});
+
+function readFileAsDataURL(file){
+  return new Promise((res, rej)=>{
+    const r = new FileReader();
+    r.onload = ()=> res(r.result);
+    r.onerror = ()=> rej(new Error("file read error"));
+    r.readAsDataURL(file);
+  });
+}
+
+function renderAdminContent(){
+  const data = loadData();
+  adminContent.innerHTML = "";
+  const cats = Object.keys(data.categories || {});
+  if(cats.length===0){
+    adminContent.innerHTML = '<div class="small-muted">لا توجد مجلدات بعد.</div>';
+    return;
+  }
+  cats.forEach(cat=>{
+    const cont = document.createElement("div");
+    cont.style.marginBottom = "10px";
+    const hdr = document.createElement("div"); hdr.style.display="flex"; hdr.style.justifyContent="space-between"; hdr.style.alignItems="center";
+    const title = document.createElement("div"); title.textContent=cat; title.style.fontWeight="800";
+    const actions = document.createElement("div");
+    const delCatBtn = document.createElement("button"); delCatBtn.className="action-danger"; delCatBtn.textContent="حذف المجلد";
+    delCatBtn.addEventListener("click", ()=>{
+      if(!confirm(`هل تريد حذف المجلد "${cat}" وكل محتواه؟ هذا حذف نهائي.`)) return;
+      const d = loadData(); delete d.categories[cat]; saveData(d); populateCategorySelect(); renderAdminContent(); renderGallery();
+    });
+    actions.appendChild(delCatBtn);
+    hdr.appendChild(title); hdr.appendChild(actions);
+    cont.appendChild(hdr);
+
+    const items = data.categories[cat].items || [];
+    const grid = document.createElement("div"); grid.style.display="grid"; grid.style.gridTemplateColumns="repeat(auto-fill,minmax(140px,1fr))"; grid.style.gap="8px"; grid.style.marginTop="8px";
+    items.forEach(item=>{
+      const card = document.createElement("div"); card.style.background="rgba(255,255,255,0.02)"; card.style.borderRadius="8px"; card.style.padding="6px"; card.style.display="flex"; card.style.flexDirection="column"; card.style.gap="6px";
+      const thumb = document.createElement(item.type==="image" ? "img" : "video");
+      thumb.className="media-thumb";
+      thumb.src = item.data;
+      thumb.controls = false;
+      thumb.style.cursor="pointer";
+      thumb.addEventListener("click", ()=> openLightbox(item));
+      card.appendChild(thumb);
+      const info = document.createElement("div"); info.style.display="flex"; info.style.justifyContent="space-between"; info.style.alignItems="center";
+      const t = document.createElement("input"); t.value = item.title || ""; t.className="input"; t.style.flex="1"; t.style.marginLeft="6px";
+      t.addEventListener("change", ()=>{
+        const d = loadData(); const list = d.categories[cat].items; const idx = list.findIndex(x=>x.id===item.id);
+        if(idx>=0){ d.categories[cat].items[idx].title = t.value; saveData(d); renderGallery(); renderAdminContent(); }
       });
+      const del = document.createElement("button"); del.textContent="حذف"; del.className="action-danger";
+      del.addEventListener("click", ()=>{
+        if(!confirm("حذف الملف نهائي؟")) return;
+        const d = loadData(); d.categories[cat].items = d.categories[cat].items.filter(x=>x.id !== item.id); saveData(d); renderAdminContent(); renderGallery();
+      });
+      info.appendChild(t); info.appendChild(del);
+      card.appendChild(info);
+      grid.appendChild(card);
+    });
+
+    cont.appendChild(grid);
+    adminContent.appendChild(cont);
+  });
+}
+
+// EXPORT / IMPORT / CLEAR
+exportBtn.addEventListener("click", ()=>{
+  const data = loadData();
+  const blob = new Blob([JSON.stringify(data)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "vc_gallery_export.json"; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+});
+
+importBtn.addEventListener("click", ()=> importFile.click());
+importFile.addEventListener("change", async (e)=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  if(!confirm("استيراد ملف سيستبدل/يمزج مع البيانات الحالية. تابع؟")) return;
+  const text = await f.text();
+  try{
+    const imported = JSON.parse(text);
+    // بسيط: إذا فيه categories نمزجها
+    const current = loadData();
+    current.categories = Object.assign({}, current.categories || {}, imported.categories || {});
+    saveData(current);
+    populateCategorySelect(); renderAdminContent(); renderGallery();
+    alert("تم الاستيراد.");
+  }catch(err){
+    alert("ملف غير صالح.");
+  }
+  importFile.value = "";
+});
+
+clearAllBtn.addEventListener("click", ()=>{
+  if(!confirm("هل تريد مسح كل البيانات؟ هذا حذف نهائي.")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  populateCategorySelect(); renderAdminContent(); renderGallery();
+  alert("تم المسح.");
+});
+
+// initial render
+renderGallery();
+
+/* ===========================
+   باقي الكود (إعدادات، ثلج، صوت) محفوظ كما كان
+   ===========================*/
+
+// مشغّل الصوت
+const player = document.getElementById('player');
+function togglePlay() {
+  if(player.paused) { player.play(); } else { player.pause(); }
+}
+
+// ثلج متحرك
+(function() {
+  const c = document.getElementById('snow');
+  const ctx = c.getContext('2d');
+  let W, H, flakes = [];
+  function resize() {
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+    const count = Math.floor((W*H)/15000);
+    flakes = Array.from({length:count},()=>spawn());
+  }
+  function spawn() {
+    return {
+      x: Math.random()*W,
+      y: Math.random()*H,
+      r: Math.random()*1.6 + 0.5,
+      s: Math.random()*0.5 + 0.2,
+      drift: Math.random()*0.5 + 0.15,
+      a: Math.random()*Math.PI*2
+    };
+  }
+  function step() {
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    for(let f of flakes){
+      f.y += f.s;
+      f.x += Math.cos(f.a += 0.01)*f.drift*0.6;
+      if(f.y > H+5) { f.y = -5; f.x = Math.random()*W; }
+      if(f.x < -5) { f.x = W+5; } else if(f.x > W+5) { f.x = -5; }
+      ctx.beginPath();
+      ctx.arc(f.x,f.y,f.r,0,Math.PI*2);
+      ctx.fill();
+    }
+    requestAnimationFrame(step);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+  step();
+})();
+
+// إعدادات الواجهة
+const wrap = document.querySelector(".wrap");
+const avatar = document.querySelector(".avatar");
+const buttons = document.querySelectorAll(".btn");
+const settingsBtn = document.getElementById("settingsBtn");
+const settingsMenu = document.getElementById("settingsMenu");
+const colorPicker = document.getElementById("colorPicker");
+const scaleInput = document.getElementById("scaleInput");
+const scaleValue = document.getElementById("scaleValue");
+const colorOptions = document.querySelectorAll(".color-option");
+
+// فتح/إغلاق القائمة
+settingsBtn.addEventListener("click", () => {
+  if(settingsMenu.classList.contains("show")){
+    closeSettings();
+  } else {
+    settingsMenu.style.display = "block";
+    setTimeout(() => settingsMenu.classList.add("show"), 10);
+    settingsBtn.classList.add("active");
+  }
+});
+
+// إغلاق القائمة بالضغط خارجها
+document.addEventListener("click", (e) => {
+  if(!settingsMenu.contains(e.target) && e.target !== settingsBtn){
+    closeSettings();
+  }
+});
+
+// تغيير الحجم بالسلايدر
+scaleInput.addEventListener("input", () => {
+  let scaleVal = scaleInput.value;
+  scaleValue.textContent = scaleVal + "%";
+  wrap.style.transform = `scale(${scaleVal/100})`;
+  document.body.style.overflowY = (scaleVal > 100) ? "auto" : "hidden";
+});
+
+// اختيار اللون
+function setColor(color) {
+  if (color === "rgb") {
+    avatar.style.animation = "rgbWave 5s infinite linear";
+    buttons.forEach(btn => btn.style.animation = "rgbWave 5s infinite linear");
+  } else {
+    avatar.style.animation = "none";
+    buttons.forEach(btn => btn.style.animation = "none");
+    document.documentElement.style.setProperty("--accent", color);
+    document.documentElement.style.setProperty("--accent-hover", color);
+    avatar.style.borderColor = color;
+    avatar.style.boxShadow = `0 0 25px ${color}, 0 0 4px rgba(255,255,255,.9) inset`;
+    buttons.forEach(btn => {
+      btn.style.background = color;
+      btn.style.boxShadow = `0 0 12px ${color}, 0 0 3px rgba(255,255,255,.7) inset`;
     });
   }
+}
 
-  loadVideos();
-</script></body>
-</html>
+// الألوان الجاهزة
+colorOptions.forEach(opt => {
+  opt.addEventListener("click", () => {
+    setColor(opt.dataset.color);
+    closeSettings();
+  });
+});
+
+// اللون من الكول بيكر
+colorPicker.addEventListener("input", () => {
+  setColor(colorPicker.value);
+  closeSettings();
+});
+
+// دالة غلق القائمة
+function closeSettings(){
+  settingsMenu.classList.remove("show");
+  settingsBtn.classList.remove("active");
+  setTimeout(() => settingsMenu.style.display = "none", 250);
+}
+</script>
+</body>
+</htm
